@@ -18,9 +18,9 @@ class Menu:
             self.screen.blit(source=self.image, dest=self.rect)
             for i in range(len(MENU_OPTION)):
                 if i == option:
-                    self.menu_text(40, MENU_OPTION[i], TEXT_MENU_C_SELECT, (SCREEN_WIDTH / 2, 500 + 40 * i))
+                    self.menu_text(70, MENU_OPTION[i], TEXT_MENU_C_SELECT, (SCREEN_WIDTH / 2, 500 + 70 * i))
                 else:
-                    self.menu_text(40, MENU_OPTION[i], TEXT_MENU_C, (SCREEN_WIDTH / 2, 500 + 40 * i))
+                    self.menu_text(60, MENU_OPTION[i], TEXT_MENU_C, (SCREEN_WIDTH / 2, 500 + 70 * i))
 
             for event in py.event.get():
                 if event.type == py.KEYDOWN:

@@ -27,7 +27,9 @@ LEVEL_OPTION = (
 
 # Colors
 TEXT_MENU_C = (255, 255, 255)
-TEXT_MENU_C_SELECT = (38, 163, 71)
+TEXT_MENU_C_SELECT = (24, 204, 72)
+COLOR_WHITE = (255,255,255)
+COLOR_BLACK = (0,0,0)
 
 # Speed
 ENTITY_SPEED = {
@@ -68,7 +70,7 @@ ENTITY_IMAGE_AMOUNT = {
         'Dead': 6,
         'Hurt': 3,
         'Idle': 7,
-        'Jump': 9,
+        'Jump': 10,
         'Run': 8,
         'Shot': 12,
         'ShotAttack': 8
@@ -80,10 +82,34 @@ ENTITY_IMAGE_AMOUNT = {
         'Dead': 5,
         'Hurt': 3,
         'Idle': 7,
-        'Jump': 8,
+        'Jump': 9,
         'Run': 8,
         'Shot': 10,
         'ShotAttack': 7
     },
     'Level1Bg': 4,
+}
+
+# Physics
+GRAVITY = 0.34
+VERTICAL_SPEED = 7
+
+# Action Delay
+ACTIONS_DELAY = {
+    'Player1': {
+        'Attack': 20,
+        'Jump': 3,
+        'frames_idle': 0.12,
+        'frames_run': 0.10,
+        'frames_jump': 0.15,
+        'frames_attack1': 0.13
+    },
+    'Player2': {
+        'Attack': 20,
+        'Jump': 2,
+        'frames_idle': 0.12,
+        'frames_run': 0.10,
+        'frames_jump': 0.15,
+        'frames_attack1': 0.20
+    }
 }

@@ -3,7 +3,7 @@ from time import sleep
 from pygame import Surface, Rect
 
 from code.Character import Character
-from code.Const import ENTITY_IMAGE_AMOUNT, SCREEN_HEIGHT, SCREEN_WIDTH
+from code.Const import ENTITY_IMAGE_AMOUNT, SCREEN_HEIGHT, SCREEN_WIDTH, ACTIONS_DELAY, VERTICAL_SPEED, GRAVITY
 import pygame as py
 
 
@@ -63,45 +63,111 @@ class Player(Character):
 
         self.direction = 'R'
 
+        self.is_jumping = False
+        self.is_idle = True
+        self.is_attack1 = False
+        self.attack_delay = ACTIONS_DELAY[self.name]['Attack']
+        self.vertical_speed = VERTICAL_SPEED
+        self.gravity = GRAVITY
+        self.jump_delay = ACTIONS_DELAY[self.name]['Jump']
+
     def update(self):
-        self.actual += 0.10
-        if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Idle']:
-            self.actual = 0
-        if self.direction == 'R':
-            self.image = self.idle[int(self.actual)]
-        else:
-            self.image = self.idle[int(self.actual)]
-            self.image = py.transform.flip(self.image, True, False)
+
+        if self.is_idle:
+            self.actual += ACTIONS_DELAY[self.name]['frames_idle']
+            if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Idle']:
+                self.actual = 0
+            if self.direction == 'R':
+                self.image = self.idle[int(self.actual)]
+                self.update_rect(self.image)
+            else:
+                self.image = self.idle[int(self.actual)]
+                self.update_rect(self.image)
+                self.image = py.transform.flip(self.image, True, False)
+
+        elif self.is_jumping:
+            self.actual += ACTIONS_DELAY[self.name]['frames_jump']
+            if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Jump']:
+                self.actual = 0
+                self.vertical_speed = VERTICAL_SPEED
+                self.gravity = GRAVITY
+                self.is_jumping = False
+                self.is_idle = True
+            if self.direction == 'R':
+                bottom_previous = self.rect.bottom
+                self.image = self.jump[int(self.actual)]
+                self.rect = self.image.get_rect(left=SCREEN_WIDTH / 2 - 200)
+                self.rect.bottom = bottom_previous
+                if self.jump.index(self.image) >= self.jump_delay:
+                    self.rect.centery -= self.vertical_speed
+                    self.vertical_speed -= self.gravity
+            else:
+                bottom_previous = self.rect.bottom
+                self.image = self.jump[int(self.actual)]
+                self.rect = self.image.get_rect(left=SCREEN_WIDTH / 2 - 200)
+                self.rect.bottom = bottom_previous
+                if self.jump.index(self.image) >= self.jump_delay:
+                    self.rect.centery -= self.vertical_speed
+                    self.vertical_speed -= self.gravity
+                self.image = py.transform.flip(self.image, True, False)
+
+        elif self.is_attack1:
+            self.actual += ACTIONS_DELAY[self.name]['frames_attack1']
+            if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Attack1']:
+                self.actual = 0
+                self.is_attack1 = False
+                self.is_idle = True
+            if self.direction == 'R':
+                self.image = self.attack1[int(self.actual)]
+                self.update_rect(self.image)
+            else:
+                self.image = self.attack1[int(self.actual)]
+                self.update_rect(self.image)
+                self.image = py.transform.flip(self.image, True, False)
+
 
     def move(self):
 
         key_pressed = py.key.get_pressed()
 
-        key_press = py.key.get_just_pressed()
-
-        if key_pressed[py.K_RIGHT]:
-            self.actual += 0.10
+        if key_pressed[py.K_RIGHT] and not self.is_jumping and not self.is_attack1:
+            self.actual += ACTIONS_DELAY[self.name]['frames_run']
             if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Run']:
                 self.actual = 0
             self.image = self.run[int(self.actual)]
+            self.update_rect(self.image)
             self.direction = 'R'
 
-        if key_pressed[py.K_LEFT]:
-            self.actual += 0.10
+        if key_pressed[py.K_LEFT] and not self.is_jumping and not self.is_attack1:
+            self.actual += ACTIONS_DELAY[self.name]['frames_run']
             if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Run']:
                 self.actual = 0
             self.image = self.run[int(self.actual)]
+            self.update_rect(self.image)
             self.image = py.transform.flip(self.image, True, False)
             self.direction = 'L'
 
-            if key_pressed[py.K_UP]:
-                self.actual += 0.05
-                if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Jump']:
-                    self.actual = 0
 
-                if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Jump'] / 2:
-                    self.rect.centery -= 1
-                else:
-                    self.rect.centery += 1
+    def just_move(self):
+        key_pressed = py.key.get_just_pressed()
 
-                self.image = self.jump[int(self.actual)]
+        if key_pressed[py.K_UP]:
+            if self.is_idle:
+                self.actual = 0
+                self.is_jumping = True
+                self.is_idle = False
+                self.is_attack1 = False
+        if key_pressed[py.K_a]:
+            if self.is_idle:
+                self.actual = 0
+                self.is_jumping = False
+                self.is_idle = False
+                self.is_attack1 = True
+
+
+    def update_rect(self, image: Surface):
+        position_previous = self.rect.right
+        self.rect = image.get_rect(left=SCREEN_WIDTH / 2 - 200)
+        self.rect.bottom = SCREEN_HEIGHT
+        if self.direction == 'L':
+            self.rect.right = position_previous
