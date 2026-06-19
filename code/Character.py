@@ -12,7 +12,6 @@ class Character(Entity):
         self.shot_attack = None
         self.shot = None
         self.jump = None
-        self.hurt = None
         self.dead = None
 
     def update(self):

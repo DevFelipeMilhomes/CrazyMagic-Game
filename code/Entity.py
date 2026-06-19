@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from pygame import Surface
+from pygame import Surface, Rect
 
 import pygame as py
 
@@ -13,7 +13,7 @@ class Entity(ABC):
         self.image = None
         self.dirname = dirname
         self.position = position
-        self.rect = None
+        self.rect: Rect = py.Rect(0, 0, 0, 0)
         self.speed = ENTITY_SPEED[self.name]
         self.health = ENTITY_HEALTH[self.name]
         self.damage = ENTITY_DAMAGE[self.name]
