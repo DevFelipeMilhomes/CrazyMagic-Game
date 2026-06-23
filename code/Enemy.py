@@ -41,14 +41,14 @@ class Enemy(Character):
                 self.attack3.append(img)
 
         self.actual = 0
-
         self.image: Surface = self.idle[self.actual]
         self.rect: Rect = self.image.get_rect(left=position[0], top=position[1])
-
         self.direction = 'L'
-
         self.is_idle = True
         self.is_attack1 = False
+        self.is_attack2 = False
+        self.is_attack3 = False
+        self.is_talk = False
         self.attack1_dmg = 0
         self.attack2_dmg = 0
         self.attack3_dmg = 0
@@ -61,87 +61,35 @@ class Enemy(Character):
     def update(self):
 
         if self.is_idle:
-            self.actual += ACTIONS_DELAY[self.name]['frames_idle']
-            if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Idle']:
-                self.actual = 0
-            if self.direction == 'R':
-                self.image = self.idle[int(self.actual)]
-                self.update_rect(self.image)
-            else:
-                self.image = self.idle[int(self.actual)]
-                self.image = py.transform.flip(self.image, True, False)
-                self.update_rect(self.image)
+            self.__idle_move()
         elif self.is_attack1:
-            self.attack_delay -= 1
-            if self.attack_delay == 0:
-                self.attack_delay = ACTIONS_DELAY[self.name]['Attack']
-                self.actual += ACTIONS_DELAY[self.name]['frames_attack1']
-                if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Attack1']:
-                    self.attack1_dmg = 0
-                    self.actual = 0
-                    self.is_attack1 = False
-                    self.is_idle = True
-                    self.attack1_dmg = 0
-                if self.direction == 'R':
-                    self.attack1_dmg += 1
-                    self.image = self.attack1[int(self.actual)]
-                    if self.is_hurt:
-                        self.image = self.hurt(self.attack1[int(self.actual)],255)
-                        self.is_hurt = False
-                    self.update_rect(self.image)
-                else:
-                    self.attack1_dmg += 1
-                    self.image = self.attack1[int(self.actual)]
-                    if self.is_hurt:
-                        self.image = self.hurt(self.attack1[int(self.actual)],255)
-                        self.is_hurt = False
-                    self.image = py.transform.flip(self.image, True, False)
-                    self.update_rect(self.image)
+            self.__attack_move('Attack1')
+        elif self.is_attack2:
+            self.__attack_move('Attack2')
+        elif self.is_attack3:
+            self.__attack_move('Attack3')
         elif self.act:
-            self.actual += ACTIONS_DELAY[self.name]['frames_run']
-            if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Run']:
-                self.actual = 0
-            if self.direction == 'R':
-                self.image = self.run[int(self.actual)]
-                if self.is_hurt:
-                    self.image = self.hurt(self.run[int(self.actual)], 255)
-                    self.is_hurt = False
-                self.update_rect(self.image)
-                self.rect.centerx += self.speed
-            else:
-                self.image = self.run[int(self.actual)]
-                if self.is_hurt:
-                    self.image = self.hurt(self.run[int(self.actual)], 255)
-                    self.is_hurt = False
-                self.image = py.transform.flip(self.image, True, False)
-                self.update_rect(self.image)
-                self.rect.centerx -= self.speed
+            self.__act_move()
         elif self.is_dead:
-
-            self.actual += ACTIONS_DELAY[self.name]['frames_dead']
-            if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Dead']:
-                self.actual = 0
-                self.is_dead = True
-                self.is_idle = True
-            else:
-                if self.direction == 'R':
-                    self.is_dead = False
-                    self.image = self.dead[int(self.actual)]
-                    self.update_rect(self.image)
-                else:
-                    self.is_dead = False
-                    self.image = self.dead[int(self.actual)]
-                    self.image = py.transform.flip(self.image, True, False)
-                    self.update_rect(self.image)
+            self.__dead_move()
 
     def move(self):
         pressed_key = py.key.get_pressed()
 
-        if pressed_key[py.K_RIGHT]:
-            self.rect.centerx -= 4
+        if not self.is_talk:
+            if pressed_key[py.K_RIGHT]:
+                self.rect.centerx -= 4
 
-        if pressed_key[py.K_LEFT]:
-            self.rect.centerx += 4
+            if pressed_key[py.K_LEFT]:
+                self.rect.centerx += 4
+
+    def verify_talk(self):
+        if self.is_talk:
+            self.is_idle = True
+            self.is_attack1 = False
+            self.is_hurt = False
+            self.is_attack2 = False
+            self.is_attack3 = False
 
     def update_rect(self, image: Surface):
         center_position = self.rect.center
@@ -157,3 +105,126 @@ class Enemy(Character):
 
         return img_bright
 
+    def __idle_move(self):
+        self.actual += ACTIONS_DELAY[self.name]['frames_Idle']
+        if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Idle']:
+            self.actual = 0
+        if self.direction == 'R':
+            self.image = self.idle[int(self.actual)]
+            self.update_rect(self.image)
+        else:
+            self.image = self.idle[int(self.actual)]
+            self.image = py.transform.flip(self.image, True, False)
+            self.update_rect(self.image)
+
+    def __attack_move(self, type_attack: str):
+        self.attack_delay -= 1
+        if self.attack_delay == 0:
+            self.attack_delay = ACTIONS_DELAY[self.name]['Attack']
+            previous = int(self.actual)
+            self.actual += ACTIONS_DELAY[self.name][f'frames_{type_attack}']
+            current = int(self.actual)
+
+            if self.actual >= ENTITY_IMAGE_AMOUNT[self.name][type_attack]:
+                if type_attack == 'Attack1':
+                    self.is_attack1 = False
+                    self.attack1_dmg = 0
+                elif type_attack == 'Attack2':
+                    self.is_attack2 = False
+                    self.attack2_dmg = 0
+                elif type_attack == 'Attack3':
+                    self.is_attack3 = False
+                    self.attack3_dmg = 0
+
+                self.actual = 0
+                self.is_idle = True
+            else:
+                if self.direction == 'R':
+                    if current != previous:
+                        if type_attack == 'Attack1': self.attack1_dmg = int(self.actual)
+                        if type_attack == 'Attack2': self.attack2_dmg = int(self.actual)
+                        if type_attack == 'Attack3': self.attack3_dmg = int(self.actual)
+                    else:
+                        if type_attack == 'Attack1': self.attack1_dmg = 0
+                        if type_attack == 'Attack2': self.attack2_dmg = 0
+                        if type_attack == 'Attack3': self.attack3_dmg = 0
+                    if type_attack == 'Attack1':
+                        self.image = self.attack1[int(self.actual)]
+                        if self.is_hurt:
+                            self.image = self.hurt(self.attack1[int(self.actual)], 255)
+                            self.is_hurt = False
+                    if type_attack == 'Attack2':
+                        self.image = self.attack2[int(self.actual)]
+                        if self.is_hurt:
+                            self.image = self.hurt(self.attack2[int(self.actual)], 255)
+                            self.is_hurt = False
+                    if type_attack == 'Attack3':
+                        self.image = self.attack3[int(self.actual)]
+                        if self.is_hurt:
+                            self.image = self.hurt(self.attack3[int(self.actual)], 255)
+                            self.is_hurt = False
+                    self.update_rect(self.image)
+
+                else:
+                    if current != previous:
+                        if type_attack == 'Attack1': self.attack1_dmg = int(self.actual)
+                        if type_attack == 'Attack2': self.attack2_dmg = int(self.actual)
+                        if type_attack == 'Attack3': self.attack3_dmg = int(self.actual)
+                    else:
+                        if type_attack == 'Attack1': self.attack1_dmg = 0
+                        if type_attack == 'Attack2': self.attack2_dmg = 0
+                        if type_attack == 'Attack3': self.attack3_dmg = 0
+                    if type_attack == 'Attack1':
+                        self.image = self.attack1[int(self.actual)]
+                        if self.is_hurt:
+                            self.image = self.hurt(self.attack1[int(self.actual)], 255)
+                            self.is_hurt = False
+                    if type_attack == 'Attack2':
+                        self.image = self.attack2[int(self.actual)]
+                        if self.is_hurt:
+                            self.image = self.hurt(self.attack2[int(self.actual)], 255)
+                            self.is_hurt = False
+                    if type_attack == 'Attack3':
+                        self.image = self.attack3[int(self.actual)]
+                        if self.is_hurt:
+                            self.image = self.hurt(self.attack3[int(self.actual)], 255)
+                            self.is_hurt = False
+                    self.image = py.transform.flip(self.image, True, False)
+                    self.update_rect(self.image)
+
+    def __act_move(self):
+        self.actual += ACTIONS_DELAY[self.name]['frames_Run']
+        if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Run']:
+            self.actual = 0
+        if self.direction == 'R':
+            self.image = self.run[int(self.actual)]
+            if self.is_hurt:
+                self.image = self.hurt(self.run[int(self.actual)], 255)
+                self.is_hurt = False
+            self.update_rect(self.image)
+            self.rect.centerx += self.speed
+        else:
+            self.image = self.run[int(self.actual)]
+            if self.is_hurt:
+                self.image = self.hurt(self.run[int(self.actual)], 255)
+                self.is_hurt = False
+            self.image = py.transform.flip(self.image, True, False)
+            self.update_rect(self.image)
+            self.rect.centerx -= self.speed
+
+    def __dead_move(self):
+        self.actual += ACTIONS_DELAY[self.name]['frames_Dead']
+        if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Dead']:
+            self.actual = 0
+            self.is_dead = True
+            self.is_idle = True
+        else:
+            if self.direction == 'R':
+                self.is_dead = False
+                self.image = self.dead[int(self.actual)]
+                self.update_rect(self.image)
+            else:
+                self.is_dead = False
+                self.image = self.dead[int(self.actual)]
+                self.image = py.transform.flip(self.image, True, False)
+                self.update_rect(self.image)

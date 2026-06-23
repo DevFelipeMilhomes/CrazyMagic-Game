@@ -1,27 +1,39 @@
+from pip._internal import self_outdated_check
 
-from code.Const import DISTANCE_ATTACK, ENTITY_DAMAGE, DAMAGE_FRAME
+from code.Background import Background
+from code.Npc import Npc
+from code.ShotPlayer import ShotPlayer
+from code.Const import DISTANCE_ATTACK, ENTITY_DAMAGE, DAMAGE_FRAME, NPC_SPEECHES
 from code.Enemy import Enemy
 from code.Entity import Entity
 from code.Player import Player
+import random
 
 
 class EntityMediator:
 
     @staticmethod
-    def __verify_player_distance_enemy(ent1: Entity, ent2: Entity):
+    def __verify_player_distance_enemy(ent1: Entity, ent2: Entity, level_text_actual: int):
         valid_interaction = False
         if isinstance(ent1, Player) and isinstance(ent2, Enemy):
             valid_interaction = True
         if isinstance(ent1, Enemy) and isinstance(ent2, Player):
+            valid_interaction = True
+        if isinstance(ent1, Player) and isinstance(ent2, Npc):
+            valid_interaction = True
+        if isinstance(ent1, Npc) and isinstance(ent2, Player):
             valid_interaction = True
 
         if valid_interaction:
             difference_distances = abs(ent1.rect.centerx - ent2.rect.centerx)
             if difference_distances < 1000:
                 if isinstance(ent2, Enemy):
-                    if not ent2.is_dead and ent2.health >0:
+                    if not ent2.is_dead and ent2.health > 0:
                         if difference_distances <= DISTANCE_ATTACK[ent2.name]:
-                            ent2.is_attack1 = True
+                            if ent2.name in ('Boss1', 'Boss3'):
+                                EntityMediator.__alter_boss_attack(ent2)
+                            else:
+                                ent2.is_attack1 = True
                             ent2.act = False
                         else:
                             ent2.is_attack1 = False
@@ -36,9 +48,12 @@ class EntityMediator:
                         if ent2.name in ('Boss1', 'Boss2', 'Boss3'):
                             ent2.active_bar_health = True
                 if isinstance(ent1, Enemy):
-                    if not ent1.is_dead and ent1.health>0:
+                    if not ent1.is_dead and ent1.health > 0:
                         if difference_distances <= DISTANCE_ATTACK[ent1.name]:
-                            ent1.is_attack1 = True
+                            if ent1.name in ('Boss1', 'Boss3'):
+                                EntityMediator.__alter_boss_attack(ent1)
+                            else:
+                                ent1.is_attack1 = True
                             ent1.act = False
                         else:
                             ent1.is_attack1 = False
@@ -49,8 +64,36 @@ class EntityMediator:
                             ent1.direction = 'R'
                         if ent2.rect.centerx < ent1.rect.centerx:
                             ent1.direction = 'L'
-                            if ent1.name in ('Boss1', 'Boss2', 'Boss3'):
-                                ent1.active_bar_health = True
+                        if ent1.name in ('Boss1', 'Boss2', 'Boss3'):
+                            ent1.active_bar_health = True
+
+                if isinstance(ent1, Npc):
+                    if difference_distances <= DISTANCE_ATTACK[ent1.name] and not ent1.closed_speech:
+                        ent1.is_talk = True
+                        if ent1.name == 'Npc1':
+                            if level_text_actual < 3:
+                                ent1.is_special = True
+                                ent1.is_idle = False
+                            else:
+                                ent1.frame_talk = False
+                                ent1.is_idle = True
+                            if level_text_actual == len(NPC_SPEECHES['Player1']['Npc1']) * 2:
+                                ent1.closed_speech = True
+                                ent1.is_talk = False
+                if isinstance(ent2, Npc):
+                    if difference_distances <= DISTANCE_ATTACK[ent2.name] and not ent2.closed_speech:
+                        ent2.is_talk = True
+                        if ent2.name == 'Npc1':
+                            if level_text_actual < 3:
+                                ent2.is_special = True
+                                ent2.is_idle = False
+                            else:
+                                ent2.frame_talk = False
+                                ent2.is_idle = True
+                            if level_text_actual == len(NPC_SPEECHES['Player1']['Npc1']) * 2:
+                                ent2.closed_speech = True
+                                ent2.is_talk = False
+
             else:
                 if isinstance(ent2, Enemy):
                     ent2.is_idle = True
@@ -60,12 +103,12 @@ class EntityMediator:
                     ent1.act = False
 
     @staticmethod
-    def verify_distance_entity(entity_list:list[Entity]):
+    def verify_distance_entity(level_text_actual: int, entity_list: list[Entity]):
         for i in range(len(entity_list)):
             entity1 = entity_list[i]
             for j in range(i + 1, len(entity_list)):
                 entity2 = entity_list[j]
-                EntityMediator.__verify_player_distance_enemy(entity1, entity2)
+                EntityMediator.__verify_player_distance_enemy(entity1, entity2, level_text_actual)
                 EntityMediator.__verify_collision_entity(entity1, entity2)
 
     @staticmethod
@@ -75,6 +118,10 @@ class EntityMediator:
             valid_interaction = True
         elif isinstance(entity1, Player) and isinstance(entity2, Enemy):
             valid_interaction = True
+        elif isinstance(entity1, ShotPlayer) and isinstance(entity2, Enemy):
+            valid_interaction = True
+        elif isinstance(entity1, Enemy) and isinstance(entity2, ShotPlayer):
+            valid_interaction = True
 
         if valid_interaction:
             if (entity1.rect.right >= entity2.rect.left and
@@ -82,33 +129,37 @@ class EntityMediator:
                     entity1.rect.bottom >= entity2.rect.top and
                     entity1.rect.top <= entity2.rect.bottom):
                 if entity1.attack1_dmg in DAMAGE_FRAME[entity1.name]['Attack1']:
-
                     entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack1']
                     entity2.is_hurt = True
 
                 if entity2.attack1_dmg in DAMAGE_FRAME[entity2.name]['Attack1']:
-
                     entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack1']
                     entity1.is_hurt = True
 
                 if entity1.attack2_dmg in DAMAGE_FRAME[entity1.name]['Attack2']:
-
                     entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack2']
                     entity2.is_hurt = True
 
                 if entity2.attack2_dmg in DAMAGE_FRAME[entity2.name]['Attack2']:
-
                     entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack2']
                     entity1.is_hurt = True
 
                 if entity1.attack3_dmg in DAMAGE_FRAME[entity1.name]['Attack3']:
-
                     entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack3']
                     entity2.is_hurt = True
 
                 if entity2.attack3_dmg in DAMAGE_FRAME[entity2.name]['Attack3']:
-
                     entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack3']
+                    entity1.is_hurt = True
+
+                if isinstance(entity1, ShotPlayer) and isinstance(entity2, Enemy):
+                    entity2.health -= entity1.damage
+                    entity1.health -= 1
+                    entity2.is_hurt = True
+
+                if isinstance(entity1, Enemy) and isinstance(entity2, ShotPlayer):
+                    entity1.health -= entity2.damage
+                    entity2.health -= 1
                     entity1.is_hurt = True
 
     @staticmethod
@@ -123,3 +174,22 @@ class EntityMediator:
                     ent.act = False
                 else:
                     entity_list.remove(ent)
+
+    @staticmethod
+    def __alter_boss_attack(enemy: Enemy):
+        attack = random.randint(1, 3)
+        if attack == 1:
+            if enemy.is_attack2 == True or enemy.is_attack3 == True:
+                enemy.is_attack1 = False
+            else:
+                enemy.is_attack1 = True
+        if attack == 2:
+            if enemy.is_attack1 == True or enemy.is_attack3 == True:
+                enemy.is_attack2 = False
+            else:
+                enemy.is_attack2 = True
+        if attack == 3:
+            if enemy.is_attack1 == True or enemy.is_attack2 == True:
+                enemy.is_attack3 = False
+            else:
+                enemy.is_attack3 = True

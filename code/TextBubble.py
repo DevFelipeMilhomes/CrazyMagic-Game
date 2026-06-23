@@ -18,6 +18,7 @@ class TextBubble:
         self.delay = ACTIONS_DELAY['TextBubble']
         self.full_text_bubble = False
         self.create = False
+        self.finish = False
         self.time_creation_full = None
         self.lifetime = lifetime
 
@@ -38,6 +39,8 @@ class TextBubble:
                 current_time = py.time.get_ticks()
                 if current_time - self.time_creation_full >= self.lifetime:
                     self.create = False
+                    self.finish = True
+
 
             self.text_surf: Surface = self.text_font.render(self.writing_process, True, COLOR_BLACK).convert_alpha()
             self.text_rect: Rect = self.text_surf.get_rect(center=self.text_position)

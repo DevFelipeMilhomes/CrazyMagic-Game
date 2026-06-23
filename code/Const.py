@@ -25,6 +25,11 @@ LEVEL_OPTION = (
     'Level3'
 )
 
+ENTITY_POSITION = {
+    'Player1': (SCREEN_WIDTH / 2 - 200, 456),
+    'Player2': (SCREEN_WIDTH / 2 - 200, 456),
+}
+
 # Colors
 TEXT_MENU_C = (255, 255, 255)
 TEXT_MENU_C_SELECT = (24, 204, 72)
@@ -68,6 +73,7 @@ ENTITY_SPEED = {
     'Npc1': 1,
     'Npc2': 1,
     'Npc3': 1,
+    'Shot': 8,
 }
 
 # Health
@@ -85,6 +91,7 @@ ENTITY_HEALTH = {
     'Npc1': 90,
     'Npc2': 90,
     'Npc3': 90,
+    'Shot': 1,
 }
 
 # Images
@@ -150,68 +157,75 @@ ENTITY_IMAGE_AMOUNT = {
 ACTIONS_DELAY = {
     'Player1': {
         'Jump': 3,
-        'frames_idle': 0.12,
-        'frames_run': 0.10,
-        'frames_jump': 0.15,
+        'frames_Idle': 0.12,
+        'frames_Run': 0.10,
+        'frames_Jump': 0.15,
         'frames_Attack1': 0.13,
         'frames_Attack2': 0.13,
         'frames_Attack3': 0.13,
-        'frames_dead': 0.03,
+        'frames_ShotAttack': 0.15,
+        'frames_Shot': 0.15,
+        'frames_Dead': 0.05,
     },
     'Player2': {
         'Jump': 2,
         'Attack': 1,
-        'frames_idle': 0.12,
-        'frames_run': 0.10,
-        'frames_jump': 0.15,
+        'frames_Idle': 0.12,
+        'frames_Run': 0.10,
+        'frames_Jump': 0.15,
         'frames_Attack1': 0.18,
-        'frames_Attack2': 0.13,
+        'frames_Attack2': 0.14,
         'frames_Attack3': 0.13,
-        'frames_dead': 0.03,
+        'frames_ShotAttack': 0.15,
+        'frames_Shot': 0.15,
+        'frames_Dead': 0.05,
     },
     'Boss1': {
         'Run': 20,
         'Attack': 1,
-        'frames_idle': 0.12,
-        'frames_run': 0.10,
-        'frames_attack1': 0.17,
-        'frames_attack2': 0.15,
-        'frames_attack3': 0.15,
-        'frames_dead': 0.01,
+        'frames_Idle': 0.12,
+        'frames_Run': 0.10,
+        'frames_Attack1': 0.17,
+        'frames_Attack2': 0.15,
+        'frames_Attack3': 0.13,
+        'frames_Dead': 0.01,
     },
     'Enemy1': {
         'Attack': 2,
-        'frames_idle': 0.12,
-        'frames_run': 0.18,
-        'frames_attack1': 0.12,
-        'frames_dead': 0.01,
+        'frames_Idle': 0.12,
+        'frames_Run': 0.18,
+        'frames_Attack1': 0.15,
+        'frames_Dead': 0.03,
     },
     'Enemy2': {
         'Attack': 2,
-        'frames_idle': 0.12,
-        'frames_run': 0.13,
-        'frames_attack1': 0.12,
-        'frames_dead': 0.05,
+        'frames_Idle': 0.12,
+        'frames_Run': 0.13,
+        'frames_Attack1': 0.15,
+        'frames_Dead': 0.07,
     },
     'Npc1': {
-        'frames_idle': 0.07,
-        'frames_special': 0.20
+        'frames_Idle': 0.04,
+        'frames_Special': 0.14
     },
     'Npc2': {
-        'frames_idle': 0.12,
-        'frames_special': 0.20
+        'frames_Idle': 0.12,
+        'frames_Special': 0.20
     },
     'Npc3': {
-        'frames_idle': 0.12,
-        'frames_special': 0.20
+        'frames_Idle': 0.12,
+        'frames_Special': 0.20
     },
-    'TextBubble': 4,
+    'TextBubble': 2,
 }
 
 DISTANCE_ATTACK = {
-    'Boss1': 250,
+    'Boss1': 300,
     'Enemy1': 190,
-    'Enemy2': 190
+    'Enemy2': 190,
+    'Npc1': 500,
+    'Npc2': 500,
+    'Npc3': 500,
 }
 
 ENTITY_FACTOR_SIZE = {
@@ -226,28 +240,31 @@ ENTITY_DAMAGE = {
     'Level1Bg1': 0,
     'Level1Bg2': 0,
     'Level1Bg3': 0,
+    'Shot': 1,
     'Player1': {
         'Attack1': 10,
         'Attack2': 15,
-        'Attack3': 10
+        'Attack3': 10,
+        'Shot': 1,
     },
     'Player2': {
         'Attack1': 5,
         'Attack2': 24,
-        'Attack3': 10
+        'Attack3': 10,
+        'Shot': 1,
     },
     'Boss1': {
         'Attack1': 4,
-        'Attack2': 0,
-        'Attack3': 0,
+        'Attack2': 7,
+        'Attack3': 12,
     },
     'Enemy1': {
-        'Attack1': 10,
+        'Attack1': 5,
         'Attack2': 0,
         'Attack3': 0,
     },
     'Enemy2': {
-        'Attack1': 10,
+        'Attack1': 7,
         'Attack2': 0,
         'Attack3': 0,
     },
@@ -269,8 +286,8 @@ DAMAGE_FRAME = {
     },
     'Boss1': {
         'Attack1': [5, 6, 7, 8, 9, 10, 11, 12, 13],
-        'Attack2': [-1],
-        'Attack3': [-1],
+        'Attack2': [3, 4],
+        'Attack3': [6, 7, 8, 9],
     },
     'Enemy1': {
         'Attack1': [3],
@@ -282,5 +299,50 @@ DAMAGE_FRAME = {
         'Attack2': [-1],
         'Attack3': [-1],
     },
+    'Shot': {
+        'Attack1': [-1],
+        'Attack2': [-1],
+        'Attack3': [-1],
+    }
+}
 
+PLAYER_SPEECHES = {
+    'Player1': {
+        'Npc1': [
+            "Felipe:\nPensou: ''esse maluco quebrou o goró'' \nCalma cara, só quero uma informação",
+            "Felipe:\nVocê viu um cara todo de preto por aqui?",
+            "Felipe:\nEsse mesmo, para onde ele foi?",
+            "Felipe:\nObrigado de verdade, e...\nVe se da uma maneirada na bebida e no cigarro",
+        ],
+
+    },
+    'Player2': {
+        'Npc1': [
+            "Yasmin:\nPensou: ''esse maluco quebrou o goró'' \nCalma cara, só quero uma informação",
+            "Yasmin:\nVocê viu um cara todo de preto por aqui?",
+            "Yasmin:\nEsse mesmo, para onde ele foi?",
+            "Yasmin:\nObrigado de verdade, e...\nVe se da uma maneirada na bebida e no cigarro",
+        ],
+
+    },
+
+}
+
+NPC_SPEECHES = {
+    'Player1': {
+        'Npc1': [
+            'Breno:\nQuem é vocẽ?\nNão vai roubar meu goró!',
+            'Breno:\nEntão tudo bem',
+            "Breno:\nO que tava sequestrando uma mulher?",
+            "Breno:\nApenas mais um dia normal por aqui...\nPode seguir reto que você encontra ele",
+        ],
+    },
+    'Player2': {
+        'Npc1': [
+            'Breno:\nQuem é vocẽ?\nNão vai roubar meu goró!',
+            'Breno:\nEntão tudo bem',
+            "Breno:\nO que tava sequestrando uma Homem?",
+            "Breno:\nApenas mais um dia normal por aqui...\nPode seguir reto que você encontra ele",
+        ],
+    },
 }

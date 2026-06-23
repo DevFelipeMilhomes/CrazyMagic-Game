@@ -1,5 +1,5 @@
 from code.Background import Background
-from code.Const import ENTITY_IMAGE_AMOUNT, SCREEN_WIDTH
+from code.Const import ENTITY_IMAGE_AMOUNT, SCREEN_WIDTH, ENTITY_POSITION
 from code.Enemy import Enemy
 from code.Npc import Npc
 from code.Player import Player
@@ -48,9 +48,9 @@ class EntityFactory:
 
                 return list_bg
             case 'Player1':
-                return Player('Player1', (SCREEN_WIDTH / 2 - 200, 456), 'Player')
+                return Player('Player1', (ENTITY_POSITION['Player1'][0],ENTITY_POSITION['Player1'][1]), 'Player')
             case 'Player2':
-                return Player('Player2', (SCREEN_WIDTH / 2 - 200, 456), 'Player')
+                return Player('Player2', (ENTITY_POSITION['Player2'][0],ENTITY_POSITION['Player2'][1]), 'Player')
             case 'Boss1':
                 return Enemy('Boss1', (position[0], position[1]), 'Enemy')
             case 'Enemy1':

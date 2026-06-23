@@ -2,94 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="99f8b358-d9aa-4d3a-aaa5-927c4dcfcdf1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/code/Enemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/code/EntityMediator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/code/Npc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/CrazyMagi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CrazyMagi.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/ShotPlayer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack12.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack13.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack14.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack15.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack1/Attack9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack2/Attack0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack2/Attack1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack2/Attack2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack2/Attack3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack2/Attack4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack2/Attack5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack2/Attack6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Atack3/Attack9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss1/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss2/Min1/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss2/Min1/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss2/Min1/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss2/Min2/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss2/Min2/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss2/Min2/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss3/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss3/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss3/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Boss3/Hurt/Hurt3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy1/Attack/Attack0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy1/Attack/Attack1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy1/Attack/Attack2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy1/Attack/Attack3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy1/Attack/Attack4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy1/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy1/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy2/Attack/Attack0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy2/Attack/Attack1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy2/Attack/Attack2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy2/Attack/Attack3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy2/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy2/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy2/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy3/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy3/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy3/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy4/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy4/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy4/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy5/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy5/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy6/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy6/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy6/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Enemy/Enemy6/Hurt/Hurt3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Player/Player1/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Player/Player1/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Player/Player1/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Player/Player2/Hurt/Hurt0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Player/Player2/Hurt/Hurt1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Player/Player2/Hurt/Hurt2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/Character.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Character.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/Background.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Background.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code/Const.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Const.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/Entity.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Entity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/Enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Enemy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code/EntityFactory.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/EntityFactory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/EntityMediator.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/EntityMediator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code/Level.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Level.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/Npc.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Npc.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code/Player.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/Player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code/TextBubble.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/TextBubble.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
