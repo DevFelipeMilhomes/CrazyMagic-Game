@@ -37,7 +37,7 @@ COLOR_WHITE = (255, 255, 255)
 COLOR_BLACK = (0, 0, 0)
 
 COLOR_BAR_HP = {
-    'Player': (2, 214, 101),
+    'Player': (7, 199, 4),
     'Boss': (201, 18, 18)
 }
 COLOR_BAR_HP_BACK = {
@@ -74,6 +74,7 @@ ENTITY_SPEED = {
     'Npc2': 1,
     'Npc3': 1,
     'Shot': 8,
+    'Potion': 1,
 }
 
 # Health
@@ -83,15 +84,26 @@ ENTITY_HEALTH = {
     'Level1Bg2': 999,
     'Level1Bg3': 999,
     'Player1': 250,
-    'Player': 250,
     'Player2': 250,
-    'Boss1': 100,
-    'Enemy1': 20,
-    'Enemy2': 40,
+    'Boss1': 350,
+    'Enemy1': 30,
+    'Enemy2': 50,
     'Npc1': 90,
     'Npc2': 90,
     'Npc3': 90,
     'Shot': 1,
+    'Potion': 1,
+}
+
+HEALTH_VARIABLE = {
+    'Player': {
+        '1': 250,
+        '2': 300,
+        '3': 350
+    },
+    'Boss': {
+        '1': 350
+    },
 }
 
 # Images
@@ -206,7 +218,7 @@ ACTIONS_DELAY = {
     },
     'Npc1': {
         'frames_Idle': 0.04,
-        'frames_Special': 0.14
+        'frames_Special': 0.20
     },
     'Npc2': {
         'frames_Idle': 0.12,
@@ -216,7 +228,7 @@ ACTIONS_DELAY = {
         'frames_Idle': 0.12,
         'frames_Special': 0.20
     },
-    'TextBubble': 2,
+    'TextBubble': 1,
 }
 
 DISTANCE_ATTACK = {
@@ -232,6 +244,11 @@ ENTITY_FACTOR_SIZE = {
     'Boss1': 5,
     'Enemy1': 3,
     'Enemy2': 4
+}
+
+INTERVAL_MOVE_POTION = {
+    'min': 640,
+    'max': 670
 }
 
 # Damage
@@ -254,8 +271,8 @@ ENTITY_DAMAGE = {
         'Shot': 1,
     },
     'Boss1': {
-        'Attack1': 4,
-        'Attack2': 7,
+        'Attack1': 5,
+        'Attack2': 10,
         'Attack3': 12,
     },
     'Enemy1': {
@@ -271,6 +288,7 @@ ENTITY_DAMAGE = {
     'Npc1': 0,
     'Npc2': 0,
     'Npc3': 0,
+    'Potion': 0,
 }
 
 DAMAGE_FRAME = {
@@ -314,6 +332,16 @@ PLAYER_SPEECHES = {
             "Felipe:\nEsse mesmo, para onde ele foi?",
             "Felipe:\nObrigado de verdade, e...\nVe se da uma maneirada na bebida e no cigarro",
         ],
+        'Npc2': [
+            "Felipe:\nSai dai doido, com essas ideias\nQuem é tu tatu?",
+            "Felipe:\nE você quer que eu faça o que?",
+            "Felipe:\nTu acha mesmo que vou tomar uma porção\n de um maluco aleatório em uma floresta?",
+        ],
+        'Npc3': [
+            "Felipe:\nPensa numa floresta que ter gente doida...",
+            "Felipe:\nE quem é essa?\nPelo nome não da medo não",
+            "Felipe:\nDe novo com isso\nAs pessoas daqui são preparadas"
+        ],
 
     },
     'Player2': {
@@ -323,6 +351,16 @@ PLAYER_SPEECHES = {
             "Yasmin:\nEsse mesmo, para onde ele foi?",
             "Yasmin:\nObrigado de verdade, e...\nVe se da uma maneirada na bebida e no cigarro",
         ],
+        'Npc2': [
+            "Yasmin:\nClaro que vou...\nEu sirvo cunt",
+            "Yasmin:\nTa dizendo que só por que sou mulher não vou conseguir?\nE você quer que eu faça o que?",
+            "Yasmin:\nTu acha mesmo que vou tomar uma porção\n de um maluco aleatório em uma floresta?",
+        ],
+        'Npc3': [
+            "Yasmin:\nFraquinha? O que...\nSò por que sou mulher?",
+            "Yasmin:\nE quem é essa?\nPelo nome não da medo não",
+            "Yasmin:\nDe novo com isso\nAs pessoas daqui são preparadas"
+        ]
 
     },
 
@@ -331,18 +369,44 @@ PLAYER_SPEECHES = {
 NPC_SPEECHES = {
     'Player1': {
         'Npc1': [
-            'Breno:\nQuem é vocẽ?\nNão vai roubar meu goró!',
+            'Breno:\nQuem é você?\nNão vai roubar meu goró!',
             'Breno:\nEntão tudo bem',
             "Breno:\nO que tava sequestrando uma mulher?",
             "Breno:\nApenas mais um dia normal por aqui...\nPode seguir reto que você encontra ele",
         ],
+        'Npc2': [
+            'Lindomar:\nAi cara será que eu poderia ver a sua espada?',
+            'Lindomar:\nÉ uma boa lamina...\nMas não vai ir muito longe nessa floresta\n se usar apenas um tipo de ataque',
+            "Lindomar:\nBebe essa parada ai...\nÉ bom demaizeee",
+        ],
+        'Npc3': [
+            "Alexandre:\nTu ta bem fraquinho ein...",
+            "Alexandre:\nSe seguir enfrente desse jeito, vai morrer fácil para\nAntônia...",
+            "Alexandre:\nÉ o demônio em 'pessoa'\nMas pega isso ai que vai ser easy",
+        ],
     },
     'Player2': {
         'Npc1': [
-            'Breno:\nQuem é vocẽ?\nNão vai roubar meu goró!',
+            'Breno:\nQuem é você?\nNão vai roubar meu goró!',
             'Breno:\nEntão tudo bem',
             "Breno:\nO que tava sequestrando uma Homem?",
             "Breno:\nApenas mais um dia normal por aqui...\nPode seguir reto que você encontra ele",
         ],
+        'Npc2': [
+            'Lindomar:\nVocê ai...\nAté que tem um bom ataque, mas não vai ir muito longe',
+            'Lindomar:\nCom apenas um ataque?...\nTem um bixo medonho vindo ai',
+            "Lindomar:\nBebe essa parada ai...\nÉ bom demaizeee",
+        ],
+        'Npc3': [
+            "Alexandre:\nTu ta bem fraquinha ein...",
+            "Alexandre:\nSe seguir enfrente desse jeito, vai morrer fácil para\nAntônia...",
+            "Alexandre:\nÉ o demônio em 'pessoa'\nMas pega isso ai mona que vai ser easy",
+        ],
     },
+}
+
+SPEECHES_AMOUNT = {
+    'Npc1': 4,
+    'Npc2': 3,
+    'Npc3': 3,
 }

@@ -55,23 +55,73 @@ class Enemy(Character):
         self.act = False
         self.is_hurt = False
         self.is_dead = False
+        self.is_dead_frame = False
         self.attack_delay = ACTIONS_DELAY[self.name]['Attack']
         self.active_bar_health = False
 
+        self.act_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Act.mp3')
+        self.act_sound.set_volume(0.7)
+        self.act_c = None
+        self.attack1_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Attack1.mp3')
+        self.attack1_sound.set_volume(0.7)
+        self.attack1_c = None
+        if self.name in ['Boss1','Boss3']:
+            self.attack2_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Attack2.mp3')
+            self.attack2_sound.set_volume(0.7)
+            self.attack2_c = None
+            self.attack3_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Attack3.mp3')
+            self.attack3_sound.set_volume(0.7)
+            self.attack3_c = None
+
     def update(self):
 
-        if self.is_idle:
+
+        if self.is_dead_frame:
+            if self.act_c:
+                self.act_c.stop()
+            if self.attack1_c:
+                self.attack1_c.stop()
+            if self.name in ['Boss1','Boss3']:
+                if self.attack2_c: self.attack2_c.stop()
+                if self.attack3_c: self.attack3_c.stop()
+            self.__dead_move()
+
+        elif self.is_idle:
             self.__idle_move()
+
         elif self.is_attack1:
+            if self.attack1_c is None or not self.attack1_c.get_busy():
+                self.attack1_c = py.mixer.find_channel()
+                if self.attack1_c:
+                    self.attack1_c.play(self.attack1_sound, loops=-1)
+                    if self.act_c:
+                        self.act_c.stop()
+                        self.act_c = None
             self.__attack_move('Attack1')
         elif self.is_attack2:
+            if self.attack2_c is None or not self.attack2_c.get_busy():
+                self.attack2_c = py.mixer.find_channel()
+                if self.attack2_c:
+                    self.attack2_c.play(self.attack2_sound, loops=-1)
+                    if self.act_c:
+                        self.act_c.stop()
+                        self.act_c = None
             self.__attack_move('Attack2')
         elif self.is_attack3:
+            if self.attack3_c is None or not self.attack3_c.get_busy():
+                self.attack3_c = py.mixer.find_channel()
+                if self.attack3_c:
+                    self.attack3_c.play(self.attack3_sound, loops=-1)
+                if self.act_c:
+                    self.act_c.stop()
+                    self.act_c = None
             self.__attack_move('Attack3')
         elif self.act:
+            if self.act_c is None or not self.act_c.get_busy():
+                self.act_c = py.mixer.find_channel()
+                if self.act_c:
+                    self.act_c.play(self.act_sound, loops=-1)
             self.__act_move()
-        elif self.is_dead:
-            self.__dead_move()
 
     def move(self):
         pressed_key = py.key.get_pressed()
@@ -90,6 +140,15 @@ class Enemy(Character):
             self.is_hurt = False
             self.is_attack2 = False
             self.is_attack3 = False
+            if self.act_c:
+                self.act_c.stop()
+            if self.attack1_c:
+                self.attack1_c.stop()
+            if self.name in ['Boss1', 'Boss3']:
+                if self.attack2_c:
+                    self.attack2_c.stop()
+                if self.attack3_c:
+                    self.attack3_c.stop()
 
     def update_rect(self, image: Surface):
         center_position = self.rect.center
@@ -129,15 +188,27 @@ class Enemy(Character):
                 if type_attack == 'Attack1':
                     self.is_attack1 = False
                     self.attack1_dmg = 0
+                    if self.attack1_c:
+                        self.attack1_c.stop()
+                        self.attack1_c = None
                 elif type_attack == 'Attack2':
                     self.is_attack2 = False
                     self.attack2_dmg = 0
+                    if self.attack2_c:
+                        self.attack2_c.stop()
+                        self.attack2_c = None
                 elif type_attack == 'Attack3':
                     self.is_attack3 = False
                     self.attack3_dmg = 0
+                    if self.attack3_c:
+                        self.attack3_c.stop()
+                        self.attack3_c = None
 
                 self.actual = 0
                 self.is_idle = True
+
+                if self.is_dead_frame:
+                    self.is_idle = False
             else:
                 if self.direction == 'R':
                     if current != previous:
@@ -217,7 +288,19 @@ class Enemy(Character):
         if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Dead']:
             self.actual = 0
             self.is_dead = True
-            self.is_idle = True
+            if self.act_c:
+                self.act_c.stop()
+                self.act_c = None
+            if self.attack1_c:
+                self.attack1_c.stop()
+                self.attack1_c = None
+            if self.name in ['Boss1', 'Boss3']:
+                if self.attack2_c:
+                    self.attack2_c.stop()
+                    self.attack2_c = None
+                if self.attack3_c:
+                    self.attack3_c.stop()
+                    self.attack3_c = None
         else:
             if self.direction == 'R':
                 self.is_dead = False

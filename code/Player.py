@@ -62,7 +62,9 @@ class Player(Character):
         self.is_attack3 = False
         self.is_shot_attack = False
         self.is_hurt = False
+        self.is_running = False
         self.is_dead = False
+        self.is_dead_frame = True
         self.is_talk = False
         self.attack1_dmg = 0
         self.attack2_dmg = 0
@@ -74,6 +76,18 @@ class Player(Character):
         self.vertical_speed = VERTICAL_SPEED
         self.gravity = GRAVITY
         self.jump_delay = ACTIONS_DELAY[self.name]['Jump']
+        self.level_finish = False
+
+        self.running_sound = py.mixer.Sound(f'./assets/Player/{self.name}/Sound/running.wav')
+        self.running_c = None
+        self.running_sound.set_volume(0.8)
+        self.attack1_sound = py.mixer.Sound(f'./assets/Player/{self.name}/Sound/Attack1.mp3')
+        self.attack1_c = None
+        self.attack2_sound = py.mixer.Sound(f'./assets/Player/{self.name}/Sound/Attack2.mp3')
+        self.attack2_c = None
+
+        self.active_health2 = False
+        self.active_health3 = False
 
     def update(self):
 
@@ -83,9 +97,25 @@ class Player(Character):
             self.__jump_move()
         elif self.is_attack1:
             if self.active_attack1:
+                if self.running_c:
+                    self.running_c.stop()
+                    self.running_c = None
+
+                if self.attack1_c is None or not self.attack1_c.get_busy():
+                    self.attack1_c = py.mixer.find_channel()
+                    if self.attack1_c:
+                        self.attack1_c.play(self.attack1_sound, loops=-1)
                 self.__attack_move('Attack1')
         elif self.is_attack2:
             if self.active_attack2:
+                if self.running_c:
+                    self.running_c.stop()
+                    self.running_c = None
+
+                if self.attack2_c is None or not self.attack2_c.get_busy():
+                    self.attack2_c = py.mixer.find_channel()
+                    if self.attack2_c:
+                        self.attack2_c.play(self.attack2_sound, loops=-1)
                 self.__attack_move('Attack2')
         elif self.is_attack3:
             if self.active_attack3:
@@ -93,7 +123,11 @@ class Player(Character):
         elif self.is_shot_attack:
             if self.active_shotAttack:
                 self.__attack_move('ShotAttack')
-        elif self.is_dead:
+        elif self.is_dead_frame:
+            if self.attack1_c:
+                self.attack1_c.stop()
+            if self.running_c:
+                self.running_c.stop()
             self.__dead_move()
 
 
@@ -101,9 +135,14 @@ class Player(Character):
 
         key_pressed = py.key.get_pressed()
 
+        move_right = key_pressed[
+                py.K_RIGHT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3
+
+        move_left = key_pressed[
+                py.K_LEFT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3
+
         if not self.is_talk:
-            if key_pressed[
-                py.K_RIGHT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3:
+            if move_right:
                 self.actual += ACTIONS_DELAY[self.name]['frames_Run']
                 if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Run']:
                     self.actual = 0
@@ -111,8 +150,7 @@ class Player(Character):
                 self.update_rect(self.image)
                 self.direction = 'R'
 
-            if key_pressed[
-                py.K_LEFT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3:
+            if move_left:
                 self.actual += ACTIONS_DELAY[self.name]['frames_Run']
                 if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Run']:
                     self.actual = 0
@@ -120,6 +158,16 @@ class Player(Character):
                 self.update_rect(self.image)
                 self.image = py.transform.flip(self.image, True, False)
                 self.direction = 'L'
+
+            if move_right or move_left:
+                if self.running_c is None or not self.running_c.get_busy():
+                    self.running_c = py.mixer.find_channel()
+                    if self.running_c:
+                        self.running_c.play(self.running_sound,loops=-1)
+            else:
+                if self.running_c:
+                    self.running_c.stop()
+                    self.running_c = None
 
     def just_move(self):
         key_pressed = py.key.get_just_pressed()
@@ -175,6 +223,16 @@ class Player(Character):
             self.is_attack3 = False
             self.is_jumping = False
             self.is_shot_attack = False
+            if self.running_c:
+                self.running_c.stop()
+                self.running_c = None
+            if self.attack1_c:
+                self.attack1_c.stop()
+                self.attack1_c = None
+            if self.attack2_c:
+                self.attack2_c.stop()
+                self.attack2 = None
+
 
     def __attack_move(self, type_attack: str):
         previous = int(self.actual)
@@ -185,9 +243,15 @@ class Player(Character):
             if type_attack == 'Attack1':
                 self.is_attack1 = False
                 self.attack1_dmg = 0
+                if self.attack1_c:
+                    self.attack1_c.stop()
+                    self.attack1_c = None
             elif type_attack == 'Attack2':
                 self.is_attack2 = False
                 self.attack2_dmg = 0
+                if self.attack2_c:
+                    self.attack2_c.stop()
+                    self.attack2_c = None
             elif type_attack == 'Attack3':
                 self.is_attack3 = False
                 self.attack3_dmg = 0
@@ -333,7 +397,7 @@ class Player(Character):
         if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Dead']:
             self.actual = 0
             self.is_dead = True
-            self.is_idle = True
+            self.is_idle = False
         else:
             if self.direction == 'R':
                 self.is_dead = False

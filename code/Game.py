@@ -21,8 +21,12 @@ class Game:
                 option_player_ret = option_player.run()
 
                 if option_player_ret:
-                    option_level = OptionLevel(self.screen,'NEW GAME')
+                    option_level = OptionLevel(self.screen, 'NEW GAME')
                     option_level_ret = option_level.run()
                     if option_level_ret:
                         level = Level(self.screen, option_level_ret, option_player_ret)
                         level_ret = level.run()
+
+                        if level_ret:
+                            option_level = OptionLevel(self.screen, level_ret[1])
+                            option_level_ret = option_level.run()

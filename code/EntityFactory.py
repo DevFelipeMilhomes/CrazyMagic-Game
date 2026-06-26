@@ -1,4 +1,7 @@
+from pygame import Surface
+
 from code.Background import Background
+import pygame as py
 from code.Const import ENTITY_IMAGE_AMOUNT, SCREEN_WIDTH, ENTITY_POSITION
 from code.Enemy import Enemy
 from code.Npc import Npc
@@ -7,7 +10,7 @@ from code.Player import Player
 
 class EntityFactory:
     @staticmethod
-    def get_entity(name: str, position: tuple = (0, 0)):
+    def get_entity(name: str, position: tuple = (0, 0), screen: Surface = py.image.load('./assets/Menu/MenuBg.png'), player: str = 'Player'):
         match name:
             case 'Level1Bg':
                 list_bg = []
@@ -58,8 +61,8 @@ class EntityFactory:
             case 'Enemy2':
                 return Enemy('Enemy2', (position[0], position[1]), 'Enemy')
             case 'Npc1':
-                return Npc('Npc1', (position[0], position[1]), 'Npc')
+                return Npc('Npc1', (position[0], position[1]), 'Npc', screen, player)
             case 'Npc2':
-                return Npc('Npc2', (position[0], position[1]), 'Npc')
+                return Npc('Npc2', (position[0], position[1]), 'Npc', screen, player)
             case 'Npc3':
-                return Npc('Npc3', (position[0], position[1]), 'Npc')
+                return Npc('Npc3', (position[0], position[1]), 'Npc',screen, player)

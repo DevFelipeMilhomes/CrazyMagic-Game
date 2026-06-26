@@ -2,12 +2,14 @@ from pip._internal import self_outdated_check
 
 from code.Background import Background
 from code.Npc import Npc
+from code.Potion import Potion
 from code.ShotPlayer import ShotPlayer
-from code.Const import DISTANCE_ATTACK, ENTITY_DAMAGE, DAMAGE_FRAME, NPC_SPEECHES
+from code.Const import DISTANCE_ATTACK, ENTITY_DAMAGE, DAMAGE_FRAME, HEALTH_VARIABLE, FIRST_SPAW, INTERVAL_MOVE_POTION
 from code.Enemy import Enemy
 from code.Entity import Entity
 from code.Player import Player
 import random
+import pygame as py
 
 
 class EntityMediator:
@@ -68,31 +70,14 @@ class EntityMediator:
                             ent1.active_bar_health = True
 
                 if isinstance(ent1, Npc):
-                    if difference_distances <= DISTANCE_ATTACK[ent1.name] and not ent1.closed_speech:
-                        ent1.is_talk = True
-                        if ent1.name == 'Npc1':
-                            if level_text_actual < 3:
-                                ent1.is_special = True
-                                ent1.is_idle = False
-                            else:
-                                ent1.frame_talk = False
-                                ent1.is_idle = True
-                            if level_text_actual == len(NPC_SPEECHES['Player1']['Npc1']) * 2:
-                                ent1.closed_speech = True
-                                ent1.is_talk = False
+                    if difference_distances <= DISTANCE_ATTACK[ent1.name]:
+                        if not ent1.closed_speech:
+                            ent1.is_talk = True
+
                 if isinstance(ent2, Npc):
-                    if difference_distances <= DISTANCE_ATTACK[ent2.name] and not ent2.closed_speech:
-                        ent2.is_talk = True
-                        if ent2.name == 'Npc1':
-                            if level_text_actual < 3:
-                                ent2.is_special = True
-                                ent2.is_idle = False
-                            else:
-                                ent2.frame_talk = False
-                                ent2.is_idle = True
-                            if level_text_actual == len(NPC_SPEECHES['Player1']['Npc1']) * 2:
-                                ent2.closed_speech = True
-                                ent2.is_talk = False
+                    if difference_distances <= DISTANCE_ATTACK[ent2.name]:
+                        if not ent2.closed_speech:
+                            ent2.is_talk = True
 
             else:
                 if isinstance(ent2, Enemy):
@@ -122,35 +107,41 @@ class EntityMediator:
             valid_interaction = True
         elif isinstance(entity1, Enemy) and isinstance(entity2, ShotPlayer):
             valid_interaction = True
+        elif isinstance(entity1, Player) and isinstance(entity2, Potion):
+            valid_interaction = True
+        elif isinstance(entity1, Potion) and isinstance(entity2, Player):
+            valid_interaction = True
 
         if valid_interaction:
             if (entity1.rect.right >= entity2.rect.left and
                     entity1.rect.left <= entity2.rect.right and
                     entity1.rect.bottom >= entity2.rect.top and
                     entity1.rect.top <= entity2.rect.bottom):
-                if entity1.attack1_dmg in DAMAGE_FRAME[entity1.name]['Attack1']:
-                    entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack1']
-                    entity2.is_hurt = True
+                if isinstance(entity1, (Player, Enemy, ShotPlayer)) and isinstance(entity2,
+                                                                                   (Player, Enemy, ShotPlayer)):
+                    if entity1.attack1_dmg in DAMAGE_FRAME[entity1.name]['Attack1']:
+                        entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack1']
+                        entity2.is_hurt = True
 
-                if entity2.attack1_dmg in DAMAGE_FRAME[entity2.name]['Attack1']:
-                    entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack1']
-                    entity1.is_hurt = True
+                    if entity2.attack1_dmg in DAMAGE_FRAME[entity2.name]['Attack1']:
+                        entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack1']
+                        entity1.is_hurt = True
 
-                if entity1.attack2_dmg in DAMAGE_FRAME[entity1.name]['Attack2']:
-                    entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack2']
-                    entity2.is_hurt = True
+                    if entity1.attack2_dmg in DAMAGE_FRAME[entity1.name]['Attack2']:
+                        entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack2']
+                        entity2.is_hurt = True
 
-                if entity2.attack2_dmg in DAMAGE_FRAME[entity2.name]['Attack2']:
-                    entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack2']
-                    entity1.is_hurt = True
+                    if entity2.attack2_dmg in DAMAGE_FRAME[entity2.name]['Attack2']:
+                        entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack2']
+                        entity1.is_hurt = True
 
-                if entity1.attack3_dmg in DAMAGE_FRAME[entity1.name]['Attack3']:
-                    entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack3']
-                    entity2.is_hurt = True
+                    if entity1.attack3_dmg in DAMAGE_FRAME[entity1.name]['Attack3']:
+                        entity2.health -= ENTITY_DAMAGE[entity1.name]['Attack3']
+                        entity2.is_hurt = True
 
-                if entity2.attack3_dmg in DAMAGE_FRAME[entity2.name]['Attack3']:
-                    entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack3']
-                    entity1.is_hurt = True
+                    if entity2.attack3_dmg in DAMAGE_FRAME[entity2.name]['Attack3']:
+                        entity1.health -= ENTITY_DAMAGE[entity2.name]['Attack3']
+                        entity1.is_hurt = True
 
                 if isinstance(entity1, ShotPlayer) and isinstance(entity2, Enemy):
                     entity2.health -= entity1.damage
@@ -162,14 +153,48 @@ class EntityMediator:
                     entity2.health -= 1
                     entity1.is_hurt = True
 
+                if isinstance(entity1, Player) and isinstance(entity2, Potion):
+                    if entity2.npc == 'Npc2':
+                        entity1.active_attack2 = True
+                        entity2.health = 0
+                    if entity2.npc == 'Npc3':
+                        entity1.health = HEALTH_VARIABLE['Player']['2']
+                        entity1.active_health2 = True
+                        entity2.health = 0
+                    if entity2.npc == 'Teleporter':
+                        entity1.level_finish = True
+                        entity2.health = 0
+
+                if isinstance(entity1, Potion) and isinstance(entity2, Player):
+                    if entity1.npc == 'Npc2':
+                        entity2.active_attack2 = True
+                        entity1.health = 0
+                    if entity1.npc == 'Npc3':
+                        entity2.health = HEALTH_VARIABLE['Player']['2']
+                        entity2.active_health2 = True
+                        entity1.health = 0
+                    if entity1.npc == 'Teleporter':
+                        entity2.level_finish = True
+                        entity1.health = 0
+
     @staticmethod
     def verify_health(entity_list: list[Entity]):
         for ent in entity_list:
             if ent.health <= 0:
+                if isinstance(ent, Potion):
+                    if ent.potion_c is None or not ent.potion_c.get_busy():
+                        ent.potion_c = py.mixer.find_channel()
+                        if ent.potion_c:
+                            ent.potion_c.play(ent.potion_sound)
                 if not ent.is_dead:
-                    ent.is_dead = True
+                    if isinstance(ent, Potion):
+                        ent.is_dead = True
+                    ent.is_dead_frame = True
                     ent.is_hurt = False
                     ent.is_attack1 = False
+                    if ent.name in ('Boss1', 'Boss3'):
+                        ent.is_attack2 = False
+                        ent.is_attack3 = False
                     ent.is_idle = False
                     ent.act = False
                 else:
