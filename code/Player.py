@@ -1,7 +1,8 @@
 from pygame import Surface, Rect
 
 from code.Character import Character
-from code.Const import ENTITY_IMAGE_AMOUNT, SCREEN_HEIGHT, SCREEN_WIDTH, ACTIONS_DELAY, VERTICAL_SPEED, GRAVITY
+from code.Const import ENTITY_IMAGE_AMOUNT, SCREEN_HEIGHT, SCREEN_WIDTH, ACTIONS_DELAY, VERTICAL_SPEED, GRAVITY, \
+    ENERGY_ENTITY, POWER_ENERGY, ENERGY_VARIABLE
 import pygame as py
 
 from code.ShotPlayer import ShotPlayer
@@ -61,6 +62,8 @@ class Player(Character):
         self.is_attack2 = False
         self.is_attack3 = False
         self.is_shot_attack = False
+        self.energy = 300
+        self.energy_bar = False
         self.is_hurt = False
         self.is_running = False
         self.is_dead = False
@@ -73,6 +76,7 @@ class Player(Character):
         self.active_attack2 = False
         self.active_attack3 = False
         self.active_shotAttack = False
+        self.active_shot = False
         self.vertical_speed = VERTICAL_SPEED
         self.gravity = GRAVITY
         self.jump_delay = ACTIONS_DELAY[self.name]['Jump']
@@ -85,9 +89,12 @@ class Player(Character):
         self.attack1_c = None
         self.attack2_sound = py.mixer.Sound(f'./assets/Player/{self.name}/Sound/Attack2.mp3')
         self.attack2_c = None
-
+        self.attack3_sound = py.mixer.Sound(f'./assets/Player/{self.name}/Sound/Attack3.mp3')
+        self.attack3_c = None
         self.active_health2 = False
         self.active_health3 = False
+        self.active_energy2 = False
+        self.energy_delay = ACTIONS_DELAY['Energy']
 
     def update(self):
 
@@ -119,8 +126,19 @@ class Player(Character):
                 self.__attack_move('Attack2')
         elif self.is_attack3:
             if self.active_attack3:
+                if self.running_c:
+                    self.running_c.stop()
+                    self.running_c = None
+
+                if self.attack3_c is None or not self.attack3_c.get_busy():
+                    self.attack3_c = py.mixer.find_channel()
+                    if self.attack3_c:
+                        self.attack3_c.play(self.attack3_sound, loops=-1)
                 self.__attack_move('Attack3')
         elif self.is_shot_attack:
+            if self.running_c:
+                self.running_c.stop()
+                self.running_c = None
             if self.active_shotAttack:
                 self.__attack_move('ShotAttack')
         elif self.is_dead_frame:
@@ -130,16 +148,25 @@ class Player(Character):
                 self.running_c.stop()
             self.__dead_move()
 
+        self.energy_delay -= 1
+        if self.energy_delay == 0:
+            self.energy_delay = ACTIONS_DELAY['Energy']
+            if self.active_energy2:
+                if self.energy < ENERGY_VARIABLE['Player']['2']:
+                    self.energy += 1
+            else:
+                if self.energy < ENERGY_VARIABLE['Player']['1']:
+                    self.energy += 1
 
     def move(self):
 
         key_pressed = py.key.get_pressed()
 
         move_right = key_pressed[
-                py.K_RIGHT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3
+                py.K_RIGHT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3 and not self.is_shot_attack
 
         move_left = key_pressed[
-                py.K_LEFT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3
+                py.K_LEFT] and not self.is_jumping and not self.is_attack1 and not self.is_attack2 and not self.is_attack3 and not self.is_shot_attack
 
         if not self.is_talk:
             if move_right:
@@ -183,10 +210,12 @@ class Player(Character):
                 self.__is_move('attack2')
         if key_pressed[py.K_f] and self.active_attack3:
             if self.is_idle:
-                self.__is_move('attack3')
+                if self.energy >= POWER_ENERGY['Attack3']:
+                    self.__is_move('attack3')
         if key_pressed[py.K_b] and self.active_shotAttack:
             if self.is_idle:
-                self.__is_move('shot_attack')
+                if self.energy >= POWER_ENERGY['Shot']:
+                    self.__is_move('shot_attack')
 
     def update_rect(self, image: Surface):
         position_previous = self.rect.right
@@ -205,8 +234,9 @@ class Player(Character):
         return img_bright
 
     def shot_ball(self):
-        if self.active_shotAttack:
-            self.active_shotAttack = False
+        if self.active_shot:
+            self.energy -= POWER_ENERGY['Shot']
+            self.active_shot = False
             if self.direction == 'R':
                 return ShotPlayer('Shot',(self.rect.right,self.rect.centery-70),self.name,self.direction)
             else:
@@ -232,7 +262,9 @@ class Player(Character):
             if self.attack2_c:
                 self.attack2_c.stop()
                 self.attack2 = None
-
+            if self.attack3_c:
+                self.attack3_c.stop()
+                self.attack3 = None
 
     def __attack_move(self, type_attack: str):
         previous = int(self.actual)
@@ -253,8 +285,12 @@ class Player(Character):
                     self.attack2_c.stop()
                     self.attack2_c = None
             elif type_attack == 'Attack3':
+                self.energy -= POWER_ENERGY['Attack3']
                 self.is_attack3 = False
                 self.attack3_dmg = 0
+                if self.attack3_c:
+                    self.attack3_c.stop()
+                    self.attack3_c = None
             elif type_attack == "ShotAttack":
                 self.is_shot_attack = False
             self.is_idle = True
@@ -327,7 +363,7 @@ class Player(Character):
                     self.attack3_dmg = 0
                 self.image = self.attack3[int(self.actual)]
                 if self.is_hurt:
-                    self.image = self.hurt(self.attack3[int(self.actual)], 255)
+                    self.imagePlayer = self.hurt(self.attack3[int(self.actual)], 255)
                     self.is_hurt = False
 
             elif type_attack == 'ShotAttack':

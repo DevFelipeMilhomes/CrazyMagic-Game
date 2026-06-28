@@ -1,10 +1,8 @@
-from pip._internal import self_outdated_check
-
-from code.Background import Background
 from code.Npc import Npc
 from code.Potion import Potion
+from code.ShotEnemy import ShotEnemy
 from code.ShotPlayer import ShotPlayer
-from code.Const import DISTANCE_ATTACK, ENTITY_DAMAGE, DAMAGE_FRAME, HEALTH_VARIABLE, FIRST_SPAW, INTERVAL_MOVE_POTION
+from code.Const import DISTANCE_ATTACK, ENTITY_DAMAGE, DAMAGE_FRAME, HEALTH_VARIABLE, ENERGY_VARIABLE
 from code.Enemy import Enemy
 from code.Entity import Entity
 from code.Player import Player
@@ -46,8 +44,7 @@ class EntityMediator:
                             ent2.direction = 'R'
                         if ent1.rect.centerx < ent2.rect.centerx:
                             ent2.direction = 'L'
-
-                        if ent2.name in ('Boss1', 'Boss2', 'Boss3'):
+                        if ent2.name in ('Boss1', 'Boss2_1','Boss2_2', 'Boss3'):
                             ent2.active_bar_health = True
                 if isinstance(ent1, Enemy):
                     if not ent1.is_dead and ent1.health > 0:
@@ -66,18 +63,24 @@ class EntityMediator:
                             ent1.direction = 'R'
                         if ent2.rect.centerx < ent1.rect.centerx:
                             ent1.direction = 'L'
-                        if ent1.name in ('Boss1', 'Boss2', 'Boss3'):
+                        if ent1.name in ('Boss1', 'Boss2_1','Boss2_2', 'Boss3'):
                             ent1.active_bar_health = True
 
                 if isinstance(ent1, Npc):
                     if difference_distances <= DISTANCE_ATTACK[ent1.name]:
-                        if not ent1.closed_speech:
-                            ent1.is_talk = True
+                        if ent1.name == 'Player1' or ent1.name == 'Player2':
+                            ent2.level_finish = True
+                        else:
+                            if not ent1.closed_speech:
+                                ent1.is_talk = True
 
                 if isinstance(ent2, Npc):
                     if difference_distances <= DISTANCE_ATTACK[ent2.name]:
-                        if not ent2.closed_speech:
-                            ent2.is_talk = True
+                        if ent2.name == 'Player1' or ent2.name == 'Player2':
+                            ent1.level_finish = True
+                        else:
+                            if not ent2.closed_speech:
+                                ent2.is_talk = True
 
             else:
                 if isinstance(ent2, Enemy):
@@ -107,10 +110,15 @@ class EntityMediator:
             valid_interaction = True
         elif isinstance(entity1, Enemy) and isinstance(entity2, ShotPlayer):
             valid_interaction = True
+        elif isinstance(entity1, ShotEnemy) and isinstance(entity2, Player):
+            valid_interaction = True
+        elif isinstance(entity1, Player) and isinstance(entity2, ShotEnemy):
+            valid_interaction = True
         elif isinstance(entity1, Player) and isinstance(entity2, Potion):
             valid_interaction = True
         elif isinstance(entity1, Potion) and isinstance(entity2, Player):
             valid_interaction = True
+
 
         if valid_interaction:
             if (entity1.rect.right >= entity2.rect.left and
@@ -145,11 +153,33 @@ class EntityMediator:
 
                 if isinstance(entity1, ShotPlayer) and isinstance(entity2, Enemy):
                     entity2.health -= entity1.damage
+                    if entity1.shot_attack_c:
+                        entity1.shot_attack_c.stop()
+                        entity1.shot_attack_c = None
                     entity1.health -= 1
                     entity2.is_hurt = True
 
                 if isinstance(entity1, Enemy) and isinstance(entity2, ShotPlayer):
                     entity1.health -= entity2.damage
+                    if entity2.shot_attack_c:
+                        entity2.shot_attack_c.stop()
+                        entity2.shot_attack_c = None
+                    entity2.health -= 1
+                    entity1.is_hurt = True
+
+                if isinstance(entity1, ShotEnemy) and isinstance(entity2, Player):
+                    entity2.health -= entity1.damage
+                    if entity1.shot_attack_c:
+                        entity1.shot_attack_c.stop()
+                        entity1.shot_attack_c = None
+                    entity1.health -= 1
+                    entity2.is_hurt = True
+
+                if isinstance(entity1, Player) and isinstance(entity2, ShotEnemy):
+                    entity1.health -= entity2.damage
+                    if entity2.shot_attack_c:
+                        entity2.shot_attack_c.stop()
+                        entity2.shot_attack_c = None
                     entity2.health -= 1
                     entity1.is_hurt = True
 
@@ -157,9 +187,23 @@ class EntityMediator:
                     if entity2.npc == 'Npc2':
                         entity1.active_attack2 = True
                         entity2.health = 0
+                    if entity2.npc == 'Npc4':
+                        entity1.active_shotAttack = True
+                        entity2.health = 0
                     if entity2.npc == 'Npc3':
                         entity1.health = HEALTH_VARIABLE['Player']['2']
                         entity1.active_health2 = True
+                        entity2.health = 0
+                    if entity2.npc == 'Npc5':
+                        entity1.health = HEALTH_VARIABLE['Player']['3']
+                        entity1.active_health3 = True
+                        entity2.health = 0
+                    if entity2.npc == 'Npc6':
+                        entity1.energy = ENERGY_VARIABLE['Player']['2']
+                        entity1.active_energy2 = True
+                        entity2.health = 0
+                    if entity2.npc == 'Npc7':
+                        entity1.active_attack3 = True
                         entity2.health = 0
                     if entity2.npc == 'Teleporter':
                         entity1.level_finish = True
@@ -169,9 +213,23 @@ class EntityMediator:
                     if entity1.npc == 'Npc2':
                         entity2.active_attack2 = True
                         entity1.health = 0
+                    if entity1.npc == 'Npc4':
+                        entity2.active_shotAttack = True
+                        entity1.health = 0
                     if entity1.npc == 'Npc3':
                         entity2.health = HEALTH_VARIABLE['Player']['2']
                         entity2.active_health2 = True
+                        entity1.health = 0
+                    if entity1.npc == 'Npc5':
+                        entity2.health = HEALTH_VARIABLE['Player']['3']
+                        entity2.active_health3 = True
+                        entity1.health = 0
+                    if entity1.npc == 'Npc6':
+                        entity2.energy = ENERGY_VARIABLE['Player']['2']
+                        entity2.active_energy2 = True
+                        entity1.health = 0
+                    if entity1.npc == 'Npc7':
+                        entity2.active_attack3 = True
                         entity1.health = 0
                     if entity1.npc == 'Teleporter':
                         entity2.level_finish = True
@@ -186,6 +244,8 @@ class EntityMediator:
                         ent.potion_c = py.mixer.find_channel()
                         if ent.potion_c:
                             ent.potion_c.play(ent.potion_sound)
+                if isinstance(ent, (ShotPlayer, ShotEnemy)):
+                    entity_list.remove(ent)
                 if not ent.is_dead:
                     if isinstance(ent, Potion):
                         ent.is_dead = True

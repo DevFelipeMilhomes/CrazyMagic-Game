@@ -1,7 +1,8 @@
 import pygame as py
 from pygame import Surface, Font, Rect
 
-from code.Const import TEXT_MENU_C, TEXT_MENU_C_SELECT, PLAYER_OPTION, PLAYER_OPTION_POSITION, LEVEL_OPTION
+from code.Const import TEXT_MENU_C, TEXT_MENU_C_SELECT, PLAYER_OPTION, PLAYER_OPTION_POSITION, LEVEL_OPTION, \
+    SCREEN_WIDTH
 
 
 class OptionLevel:
@@ -14,50 +15,59 @@ class OptionLevel:
         if level_previous == 'NEW GAME':
             # level option 1
             self.level_option1 = py.image.load('./assets/Menu/Level1Open.png').convert_alpha()
-            self.level_option1_rect = self.level_option1.get_rect(left=480, top=45)
+            self.level_option1_rect = self.level_option1.get_rect(left=80, top=270)
             # level option 2
             self.level_option2 = py.image.load('./assets/Menu/Level2Close.png').convert_alpha()
             self.level_option2_rect = self.level_option2.get_rect(left=480, top=270)
             # level option 2
             self.level_option3 = py.image.load('./assets/Menu/Level3Close.png').convert_alpha()
-            self.level_option3_rect = self.level_option3.get_rect(left=480, top=495)
+            self.level_option3_rect = self.level_option3.get_rect(left=880, top=270)
         elif level_previous == 'Level1':
             # level option 1
             self.level_option1 = py.image.load('./assets/Menu/Level1Open.png').convert_alpha()
-            self.level_option1_rect = self.level_option1.get_rect(left=480, top=45)
+            self.level_option1_rect = self.level_option1.get_rect(left=80, top=270)
             # level option 2
             self.level_option2 = py.image.load('./assets/Menu/Level2Open.png').convert_alpha()
             self.level_option2_rect = self.level_option2.get_rect(left=480, top=270)
             # level option 2
             self.level_option3 = py.image.load('./assets/Menu/Level3Close.png').convert_alpha()
-            self.level_option3_rect = self.level_option3.get_rect(left=480, top=495)
+            self.level_option3_rect = self.level_option3.get_rect(left=880, top=270)
         else:
             # level option 1
             self.level_option1 = py.image.load('./assets/Menu/Level1Open.png').convert_alpha()
-            self.level_option1_rect = self.level_option1.get_rect(left=480, top=45)
+            self.level_option1_rect = self.level_option1.get_rect(left=80, top=270)
             # level option 2
             self.level_option2 = py.image.load('./assets/Menu/Level2Open.png').convert_alpha()
             self.level_option2_rect = self.level_option2.get_rect(left=480, top=270)
             # level option 2
             self.level_option3 = py.image.load('./assets/Menu/Level3Open.png').convert_alpha()
-            self.level_option3_rect = self.level_option3.get_rect(left=480, top=495)
+            self.level_option3_rect = self.level_option3.get_rect(left=880, top=270)
 
         self.rect_select = self.level_option1_rect
 
 
     def run(self):
-
-        option = 0
+        option = 1
         while True:
             self.screen.blit(source=self.image,dest=self.rect)
-            py.draw.rect(self.screen,TEXT_MENU_C_SELECT ,self.rect_select.scale_by(1.06))
+            if self.rect_select is not None:
+                py.draw.rect(self.screen,TEXT_MENU_C_SELECT ,self.rect_select.scale_by(1.06))
             self.screen.blit(source=self.level_option1,dest=self.level_option1_rect)
             self.screen.blit(source=self.level_option2, dest=self.level_option2_rect)
             self.screen.blit(source=self.level_option3, dest=self.level_option3_rect)
 
+            self.option_text(50, 'Escolha a fase', TEXT_MENU_C,
+                             (SCREEN_WIDTH / 2, 100))
+            self.option_text(50, 'Voltar', TEXT_MENU_C,
+                             (SCREEN_WIDTH / 2, 600))
+
             if option == 0:
-                self.rect_select = self.level_option1_rect
+                self.rect_select = None
+                self.option_text(50, 'Voltar', TEXT_MENU_C_SELECT,
+                                 (SCREEN_WIDTH / 2, 600))
             elif option == 1:
+                self.rect_select = self.level_option1_rect
+            elif option == 2:
                 self.rect_select = self.level_option2_rect
             else:
                 self.rect_select = self.level_option3_rect
@@ -65,9 +75,11 @@ class OptionLevel:
 
             for event in py.event.get():
                 if  event.type == py.KEYDOWN:
-                    if event.key == py.K_DOWN:
+                    if event.key == py.K_RIGHT:
                         if self.level_previous == 'NEW GAME':
-                            pass
+                            option += 1
+                            if option >= len(LEVEL_OPTION) - 2:
+                                option = 0
                         elif self.level_previous == 'Level1':
                             option += 1
                             if option >= len(LEVEL_OPTION) - 1:
@@ -76,9 +88,11 @@ class OptionLevel:
                             option += 1
                             if option >= len(LEVEL_OPTION):
                                 option = 0
-                    if event.key == py.K_UP:
+                    if event.key == py.K_LEFT:
                         if self.level_previous == 'NEW GAME':
-                            pass
+                            option += 1
+                            if option >= len(LEVEL_OPTION) - 2:
+                                option = 0
                         elif self.level_previous == 'Level1':
                             option -= 1
                             if option <= -1:
@@ -89,6 +103,8 @@ class OptionLevel:
                                 option = len(LEVEL_OPTION) - 1
 
                     if event.key == py.K_RETURN:
+                        if option == 0:
+                            return False
                         return LEVEL_OPTION[option]
 
                 if event.type == py.QUIT:

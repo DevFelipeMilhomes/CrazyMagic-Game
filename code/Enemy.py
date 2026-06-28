@@ -3,6 +3,7 @@ from pygame import Surface, Rect
 
 from code.Character import Character
 from code.Const import ENTITY_IMAGE_AMOUNT, ACTIONS_DELAY, SCREEN_HEIGHT, ENTITY_FACTOR_SIZE
+from code.ShotEnemy import ShotEnemy
 
 
 class Enemy(Character):
@@ -48,6 +49,7 @@ class Enemy(Character):
         self.is_attack1 = False
         self.is_attack2 = False
         self.is_attack3 = False
+        self.active_shot = False
         self.is_talk = False
         self.attack1_dmg = 0
         self.attack2_dmg = 0
@@ -62,10 +64,11 @@ class Enemy(Character):
         self.act_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Act.mp3')
         self.act_sound.set_volume(0.7)
         self.act_c = None
-        self.attack1_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Attack1.mp3')
-        self.attack1_sound.set_volume(0.7)
-        self.attack1_c = None
-        if self.name in ['Boss1','Boss3']:
+        if self.name != 'Enemy6':
+            self.attack1_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Attack1.mp3')
+            self.attack1_sound.set_volume(0.7)
+            self.attack1_c = None
+        if self.name in ['Boss1']:
             self.attack2_sound = py.mixer.Sound(f'./assets/Enemy/{self.name}/Sound/Attack2.mp3')
             self.attack2_sound.set_volume(0.7)
             self.attack2_c = None
@@ -75,13 +78,13 @@ class Enemy(Character):
 
     def update(self):
 
-
         if self.is_dead_frame:
             if self.act_c:
                 self.act_c.stop()
-            if self.attack1_c:
-                self.attack1_c.stop()
-            if self.name in ['Boss1','Boss3']:
+            if self.name != 'Enemy6':
+                if self.attack1_c:
+                    self.attack1_c.stop()
+            if self.name in ['Boss1']:
                 if self.attack2_c: self.attack2_c.stop()
                 if self.attack3_c: self.attack3_c.stop()
             self.__dead_move()
@@ -90,31 +93,34 @@ class Enemy(Character):
             self.__idle_move()
 
         elif self.is_attack1:
-            if self.attack1_c is None or not self.attack1_c.get_busy():
-                self.attack1_c = py.mixer.find_channel()
-                if self.attack1_c:
-                    self.attack1_c.play(self.attack1_sound, loops=-1)
-                    if self.act_c:
-                        self.act_c.stop()
-                        self.act_c = None
+            if self.name != 'Enemy6':
+                if self.attack1_c is None or not self.attack1_c.get_busy():
+                    self.attack1_c = py.mixer.find_channel()
+                    if self.attack1_c:
+                        self.attack1_c.play(self.attack1_sound, loops=-1)
+                        if self.act_c:
+                            self.act_c.stop()
+                            self.act_c = None
             self.__attack_move('Attack1')
         elif self.is_attack2:
-            if self.attack2_c is None or not self.attack2_c.get_busy():
-                self.attack2_c = py.mixer.find_channel()
-                if self.attack2_c:
-                    self.attack2_c.play(self.attack2_sound, loops=-1)
+            if self.name != 'Boss3':
+                if self.attack2_c is None or not self.attack2_c.get_busy():
+                    self.attack2_c = py.mixer.find_channel()
+                    if self.attack2_c:
+                        self.attack2_c.play(self.attack2_sound, loops=-1)
+                        if self.act_c:
+                            self.act_c.stop()
+                            self.act_c = None
+            self.__attack_move('Attack2')
+        elif self.is_attack3:
+            if self.name != 'Boss3':
+                if self.attack3_c is None or not self.attack3_c.get_busy():
+                    self.attack3_c = py.mixer.find_channel()
+                    if self.attack3_c:
+                        self.attack3_c.play(self.attack3_sound, loops=-1)
                     if self.act_c:
                         self.act_c.stop()
                         self.act_c = None
-            self.__attack_move('Attack2')
-        elif self.is_attack3:
-            if self.attack3_c is None or not self.attack3_c.get_busy():
-                self.attack3_c = py.mixer.find_channel()
-                if self.attack3_c:
-                    self.attack3_c.play(self.attack3_sound, loops=-1)
-                if self.act_c:
-                    self.act_c.stop()
-                    self.act_c = None
             self.__attack_move('Attack3')
         elif self.act:
             if self.act_c is None or not self.act_c.get_busy():
@@ -142,13 +148,30 @@ class Enemy(Character):
             self.is_attack3 = False
             if self.act_c:
                 self.act_c.stop()
-            if self.attack1_c:
-                self.attack1_c.stop()
-            if self.name in ['Boss1', 'Boss3']:
+            if self.name != 'Enemy6':
+                if self.attack1_c:
+                    self.attack1_c.stop()
+            if self.name in ['Boss1']:
                 if self.attack2_c:
                     self.attack2_c.stop()
                 if self.attack3_c:
                     self.attack3_c.stop()
+
+    def shot_ball(self):
+        if self.active_shot:
+            self.active_shot = False
+            if self.direction == 'R':
+                if self.is_attack2:
+                    return ShotEnemy('Shot2', (self.rect.right, self.rect.centery - 90), self.name, self.direction)
+
+                return ShotEnemy('Shot', (self.rect.right, self.rect.centery - 90), self.name, self.direction)
+
+            else:
+                if self.is_attack2:
+                    return ShotEnemy('Shot2', (self.rect.left, self.rect.centery - 90), self.name, self.direction)
+                return ShotEnemy('Shot', (self.rect.left, self.rect.centery - 90), self.name, self.direction)
+        else:
+            return None
 
     def update_rect(self, image: Surface):
         center_position = self.rect.center
@@ -188,21 +211,24 @@ class Enemy(Character):
                 if type_attack == 'Attack1':
                     self.is_attack1 = False
                     self.attack1_dmg = 0
-                    if self.attack1_c:
-                        self.attack1_c.stop()
-                        self.attack1_c = None
+                    if self.name != 'Enemy6':
+                        if self.attack1_c:
+                            self.attack1_c.stop()
+                            self.attack1_c = None
                 elif type_attack == 'Attack2':
                     self.is_attack2 = False
                     self.attack2_dmg = 0
-                    if self.attack2_c:
-                        self.attack2_c.stop()
-                        self.attack2_c = None
+                    if self.name != 'Boss3':
+                        if self.attack2_c:
+                            self.attack2_c.stop()
+                            self.attack2_c = None
                 elif type_attack == 'Attack3':
                     self.is_attack3 = False
                     self.attack3_dmg = 0
-                    if self.attack3_c:
-                        self.attack3_c.stop()
-                        self.attack3_c = None
+                    if self.name != 'Boss3':
+                        if self.attack3_c:
+                            self.attack3_c.stop()
+                            self.attack3_c = None
 
                 self.actual = 0
                 self.is_idle = True
@@ -221,16 +247,28 @@ class Enemy(Character):
                         if type_attack == 'Attack3': self.attack3_dmg = 0
                     if type_attack == 'Attack1':
                         self.image = self.attack1[int(self.actual)]
+                        if self.name == 'Enemy6':
+                            if self.attack1.index(self.image) == ENTITY_IMAGE_AMOUNT[self.name][type_attack] - 2:
+                                if previous != current:
+                                    self.active_shot = True
                         if self.is_hurt:
                             self.image = self.hurt(self.attack1[int(self.actual)], 255)
                             self.is_hurt = False
                     if type_attack == 'Attack2':
                         self.image = self.attack2[int(self.actual)]
+                        if self.name == 'Boss3':
+                            if self.attack2.index(self.image) == ENTITY_IMAGE_AMOUNT[self.name][type_attack] - 2:
+                                if previous != current:
+                                    self.active_shot = True
                         if self.is_hurt:
                             self.image = self.hurt(self.attack2[int(self.actual)], 255)
                             self.is_hurt = False
                     if type_attack == 'Attack3':
                         self.image = self.attack3[int(self.actual)]
+                        if self.name == 'Boss3':
+                            if self.attack3.index(self.image) == ENTITY_IMAGE_AMOUNT[self.name][type_attack] - 2:
+                                if previous != current:
+                                    self.active_shot = True
                         if self.is_hurt:
                             self.image = self.hurt(self.attack3[int(self.actual)], 255)
                             self.is_hurt = False
@@ -247,16 +285,28 @@ class Enemy(Character):
                         if type_attack == 'Attack3': self.attack3_dmg = 0
                     if type_attack == 'Attack1':
                         self.image = self.attack1[int(self.actual)]
+                        if self.name == 'Enemy6':
+                            if self.attack1.index(self.image) == ENTITY_IMAGE_AMOUNT[self.name][type_attack] - 2:
+                                if previous != current:
+                                    self.active_shot = True
                         if self.is_hurt:
                             self.image = self.hurt(self.attack1[int(self.actual)], 255)
                             self.is_hurt = False
                     if type_attack == 'Attack2':
                         self.image = self.attack2[int(self.actual)]
+                        if self.name == 'Boss3':
+                            if self.attack2.index(self.image) == ENTITY_IMAGE_AMOUNT[self.name][type_attack] - 2:
+                                if previous != current:
+                                    self.active_shot = True
                         if self.is_hurt:
                             self.image = self.hurt(self.attack2[int(self.actual)], 255)
                             self.is_hurt = False
                     if type_attack == 'Attack3':
                         self.image = self.attack3[int(self.actual)]
+                        if self.name == 'Boss3':
+                            if self.attack3.index(self.image) == ENTITY_IMAGE_AMOUNT[self.name][type_attack] - 2:
+                                if previous != current:
+                                    self.active_shot = True
                         if self.is_hurt:
                             self.image = self.hurt(self.attack3[int(self.actual)], 255)
                             self.is_hurt = False
@@ -291,10 +341,11 @@ class Enemy(Character):
             if self.act_c:
                 self.act_c.stop()
                 self.act_c = None
-            if self.attack1_c:
-                self.attack1_c.stop()
-                self.attack1_c = None
-            if self.name in ['Boss1', 'Boss3']:
+            if self.name != 'Enemy6':
+                if self.attack1_c:
+                    self.attack1_c.stop()
+                    self.attack1_c = None
+            if self.name in ['Boss1']:
                 if self.attack2_c:
                     self.attack2_c.stop()
                     self.attack2_c = None

@@ -29,10 +29,19 @@ class ShotPlayer(Entity):
         self.is_idle = False
         self.is_talk = False
         self.act = False
+        self.shot_attack_sound = py.mixer.Sound(f'./assets/Player/{dirname}/Sound/ShotAttack.mp3')
+        self.shot_attack_c = None
 
     def update(self):
+        if self.shot_attack_c is None or not self.shot_attack_c.get_busy():
+            self.shot_attack_c = py.mixer.find_channel()
+            if self.shot_attack_c:
+                self.shot_attack_c.play(self.shot_attack_sound)
         self.actual += ACTIONS_DELAY[self.dirname]['frames_Shot']
         if self.actual >= ENTITY_IMAGE_AMOUNT[self.dirname]['Shot']:
+            if self.shot_attack_c:
+                self.shot_attack_c.stop()
+                self.shot_attack_c = None
             self.actual = 0
             self.health = 0
         else:

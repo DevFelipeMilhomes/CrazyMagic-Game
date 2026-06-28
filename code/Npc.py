@@ -12,15 +12,28 @@ class Npc(Character):
     def __init__(self, name, position, dirname, screen: Surface, player: str):
         super().__init__(name, position, dirname)
         self.idle = []
-        for i in range(ENTITY_IMAGE_AMOUNT[name]['Idle']):
-            img = py.image.load(f'./assets/{dirname}/{name}/Idle/Idle{i}.png').convert_alpha()
-            img = py.transform.scale_by(img, 4)
-            self.idle.append(img)
-        self.special = []
-        for i in range(ENTITY_IMAGE_AMOUNT[name]['Special']):
-            img = py.image.load(f'./assets/{dirname}/{name}/Special/Special{i}.png').convert_alpha()
-            img = py.transform.scale_by(img, 4)
-            self.special.append(img)
+        if name == 'Player1':
+            for i in range(ENTITY_IMAGE_AMOUNT[name]['Idle']):
+                img = py.image.load(f'./assets/Player/Player1/Idle/Idle{i}.png').convert_alpha()
+                img = py.transform.scale_by(img, 4)
+                self.idle.append(img)
+        elif name == 'Player2':
+            for i in range(ENTITY_IMAGE_AMOUNT[name]['Idle']):
+                img = py.image.load(f'./assets/Player/Player2/Idle/Idle{i}.png').convert_alpha()
+                img = py.transform.scale_by(img, 4)
+                self.idle.append(img)
+        else:
+            for i in range(ENTITY_IMAGE_AMOUNT[name]['Idle']):
+                img = py.image.load(f'./assets/{dirname}/{name}/Idle/Idle{i}.png').convert_alpha()
+                img = py.transform.scale_by(img, 4)
+                self.idle.append(img)
+
+        if self.name != 'Player1' and self.name != 'Player2':
+            self.special = []
+            for i in range(ENTITY_IMAGE_AMOUNT[name]['Special']):
+                img = py.image.load(f'./assets/{dirname}/{name}/Special/Special{i}.png').convert_alpha()
+                img = py.transform.scale_by(img, 4)
+                self.special.append(img)
 
         self.actual = 0
 
@@ -42,22 +55,25 @@ class Npc(Character):
         self.test = 0
         self.text_bubble_list: list[TextBubble] = []
 
-        for i in range(SPEECHES_AMOUNT[name]):
-            self.text_bubble_list.append(
-                TextBubble(self.screen, 30, NPC_SPEECHES[player][name][i],
-                           (ENTITY_POSITION[player][0] + 500,
-                            ENTITY_POSITION[player][1] - 70), 10000))
+        if self.name != 'Player1' and self.name != 'Player2':
+            for i in range(SPEECHES_AMOUNT[name]):
+                self.text_bubble_list.append(
+                    TextBubble(self.screen, 30, NPC_SPEECHES[player][name][i],
+                               (ENTITY_POSITION[player][0] + 500,
+                                ENTITY_POSITION[player][1] - 70), 10000))
 
-            self.text_bubble_list.append(
-                TextBubble(self.screen, 30, PLAYER_SPEECHES[player][name][i],
-                           (ENTITY_POSITION[player][0],
-                            ENTITY_POSITION[player][1] - 70), 10000))
+                self.text_bubble_list.append(
+                    TextBubble(self.screen, 30, PLAYER_SPEECHES[player][name][i],
+                               (ENTITY_POSITION[player][0],
+                                ENTITY_POSITION[player][1] - 70), 10000))
 
-        self.special_sound = py.mixer.Sound(f'./assets/Npc/{self.name}/Sound/Special.mp3')
-        self.special_c = None
+            self.special_sound = py.mixer.Sound(f'./assets/Npc/{self.name}/Sound/Special.mp3')
+            self.special_c = None
+
         self.frame_sound = 0
         self.sound_now = True
         self.give_potion = False
+        self.one_potion = False
 
     def update(self):
 
@@ -83,12 +99,12 @@ class Npc(Character):
 
             self.actual += ACTIONS_DELAY[self.name]['frames_Special']
             if self.actual >= ENTITY_IMAGE_AMOUNT[self.name]['Special']:
-                if self.name == 'Npc1':
+                if self.name in ['Npc1','Npc4']:
                     self.frame_talk = True
                     if self.special_c:
                         self.special_c.stop()
                         self.special_c = None
-                if self.name in ['Npc2','Npc3']:
+                if self.name in ['Npc2','Npc3','Npc5','Npc6','Npc7']:
                     self.give_potion = True
                     self.is_idle = True
                 self.actual = 0
@@ -99,11 +115,15 @@ class Npc(Character):
                     self.image = self.special[int(self.actual)]
                     if self.frame_talk:
                         self.image = self.special[ENTITY_IMAGE_AMOUNT[self.name]['Special'] - 1]
+                        if self.name == 'Npc4':
+                            self.image = self.special[ENTITY_IMAGE_AMOUNT[self.name]['Special'] - 7]
                     self.update_rect(self.image)
                 else:
                     self.image = self.special[int(self.actual)]
                     if self.frame_talk:
                         self.image = self.special[ENTITY_IMAGE_AMOUNT[self.name]['Special'] - 1]
+                        if self.name == 'Npc4':
+                            self.image = self.special[ENTITY_IMAGE_AMOUNT[self.name]['Special'] - 7]
                     self.update_rect(self.image)
                     self.image = py.transform.flip(self.image, True, False)
 
@@ -155,7 +175,18 @@ class Npc(Character):
                         self.is_special = False
                         self.is_idle = True
 
-                if self.name in ['Npc2', 'Npc3']:
+                if self.name == 'Npc4':
+                    if self.text_bubble_list.index(text) == 0 and text_created_not_finalized:
+                        self.is_special = True
+                        self.is_idle = False
+                    if self.text_bubble_list.index(text) == 4 and text_created_not_finalized and not self.one_potion:
+                        self.give_potion = True
+                        self.one_potion = True
+                    if self.text_bubble_list.index(text) == 5 and text_created_not_finalized:
+                        self.is_special = False
+                        self.is_idle = True
+
+                if self.name in ['Npc2', 'Npc3', 'Npc5','Npc6','Npc7']:
                     if self.text_bubble_list.index(text) == 4 and text_created_not_finalized and not self.is_special:
                         self.is_special = True
                         self.is_idle = False
