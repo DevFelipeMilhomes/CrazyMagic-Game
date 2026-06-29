@@ -4,9 +4,9 @@ SCREEN_HEIGHT = 720
 
 # Menu texts
 MENU_OPTION = (
-    'NEW GAME',
-    'SCORE',
-    'EXIT'
+    'NOVO JOGO',
+    'RANKING',
+    'SAIR'
 )
 
 PLAYER_OPTION = (
@@ -38,6 +38,7 @@ TEXT_MENU_C = (255, 255, 255)
 TEXT_MENU_C_SELECT = (24, 204, 72)
 COLOR_WHITE = (255, 255, 255)
 COLOR_BLACK = (0, 0, 0)
+COLOR_YELLOW = (232, 190, 5)
 
 COLOR_BAR_HP = {
     'Player': (7, 199, 4),
@@ -518,13 +519,13 @@ ENTITY_DAMAGE = {
     'Shot2': 1,
     'Player1': {
         'Attack1': 10,
-        'Attack2': 15,
+        'Attack2': 16,
         'Attack3': 14,
         'Shot': 30,
     },
     'Player2': {
         'Attack1': 5,
-        'Attack2': 30,
+        'Attack2': 32,
         'Attack3': 14,
         'Shot': 30,
     },

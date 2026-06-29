@@ -12,7 +12,7 @@ class OptionLevel:
         self.rect = self.image.get_rect(left=0,top=0)
         self.level_previous = level_previous
 
-        if level_previous == 'NEW GAME':
+        if level_previous == 'NOVO JOGO':
             # level option 1
             self.level_option1 = py.image.load('./assets/Menu/Level1Open.png').convert_alpha()
             self.level_option1_rect = self.level_option1.get_rect(left=80, top=270)
@@ -76,7 +76,7 @@ class OptionLevel:
             for event in py.event.get():
                 if  event.type == py.KEYDOWN:
                     if event.key == py.K_RIGHT:
-                        if self.level_previous == 'NEW GAME':
+                        if self.level_previous == 'NOVO JOGO':
                             option += 1
                             if option >= len(LEVEL_OPTION) - 2:
                                 option = 0
@@ -89,7 +89,7 @@ class OptionLevel:
                             if option >= len(LEVEL_OPTION):
                                 option = 0
                     if event.key == py.K_LEFT:
-                        if self.level_previous == 'NEW GAME':
+                        if self.level_previous == 'NOVO JOGO':
                             option += 1
                             if option >= len(LEVEL_OPTION) - 2:
                                 option = 0

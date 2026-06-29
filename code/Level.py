@@ -26,7 +26,6 @@ class Level:
         self.background_list: list[Background] = []
         self.text_bubble_list: list[TextBubble] = []
         self.talk = False
-        py.mixer.music.stop()
 
         sound = py.mixer.Sound(f'./assets/Background/Level1Bg/Sound/nature.mp3')
         self.what_health = '1'
@@ -128,7 +127,7 @@ class Level:
             self.entity_list.append(player)
             self.entity_list.append(
                 EntityFactory.get_entity('Boss3', (FIRST_SPAW + SCREEN_WIDTH + INTERVAL_SPAW * 4, 0)))
-            if player == 'Player1':
+            if self.playerName == 'Player1':
                 self.entity_list.append(
                     EntityFactory.get_entity('Player2Npc', (FIRST_SPAW * 8 - 800, 0), self.screen,
                                              player))
@@ -264,9 +263,10 @@ class Level:
                         if self.actual_text == 2 and self.text_bubble_list[self.actual_text].finish:
                             self.actual_text += 1
                         if self.actual_text == 3 and self.text_bubble_list[self.actual_text].finish:
+                            py.mixer.stop()
                             self.level_sound.stop()
                             self.entity_list = []
-                            return ['WIN', self.name, self.playerName]
+                            return self.name
 
                 if self.name == "Level2":
                     for text in self.text_bubble_list:
@@ -274,9 +274,10 @@ class Level:
                         if self.actual_text == 0 and self.text_bubble_list[self.actual_text].finish:
                             self.actual_text += 1
                         if self.actual_text == 1 and self.text_bubble_list[self.actual_text].finish:
+                            py.mixer.stop()
                             self.level_sound.stop()
                             self.entity_list = []
-                            return ['WIN', self.name, self.playerName]
+                            return self.name
 
                 if self.name == "Level3":
                     for text in self.text_bubble_list:
@@ -284,9 +285,10 @@ class Level:
                         if self.actual_text == 0 and self.text_bubble_list[self.actual_text].finish:
                             self.actual_text += 1
                         if self.actual_text == 1 and self.text_bubble_list[self.actual_text].finish:
+                            py.mixer.stop()
                             self.level_sound.stop()
                             self.entity_list = []
-                            return ['WIN', self.name, self.playerName]
+                            return self.name
 
 
 

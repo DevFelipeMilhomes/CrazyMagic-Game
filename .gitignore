@@ -1,0 +1,8 @@
+# created by virtualenv automatically
+venv/
+.venv/
+.venv/bin
+
+DBRanking
+db.sqlite3
+db.sqlite3-journal

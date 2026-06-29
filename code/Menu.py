@@ -12,8 +12,6 @@ class Menu:
 
     def run(self):
         option = 0
-        py.mixer.music.load('./assets/Menu/Sound/Menu_sound.mp3')
-        py.mixer.music.play(-1)
         while True:
 
             self.screen.blit(source=self.image, dest=self.rect)
